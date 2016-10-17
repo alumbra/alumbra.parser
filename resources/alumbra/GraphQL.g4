@@ -48,9 +48,9 @@ operationDefinition
     ;
 
 operationType
-    : 'query'
-    | 'mutation'
-    | 'subscription'
+    : K_QUERY
+    | K_MUTATION
+    | K_SUBSCRIPTION
     ;
 
 variableDefinitions
@@ -80,11 +80,11 @@ selection
     ;
 
 field
-    : alias? NAME arguments? directives? selectionSet?
+    : alias? anyName arguments? directives? selectionSet?
     ;
 
 alias
-    : NAME ':'
+    : anyName  ':'
     ;
 
 arguments
@@ -92,7 +92,7 @@ arguments
     ;
 
 argument
-    : NAME ':' valueWithVariable
+    : anyName ':' valueWithVariable
     ;
 
 fragmentSpread
@@ -105,10 +105,6 @@ inlineFragment
 
 fragmentDefinition
     : 'fragment' fragmentName typeCondition directives? selectionSet
-    ;
-
-fragmentName
-    :  NAME
     ;
 
 typeCondition
@@ -135,7 +131,7 @@ valueWithVariable
     | objectValueWithVariable;
 
 enumValue
-    : NAME
+    : anyName
     ;
 
 arrayValue
@@ -155,11 +151,11 @@ objectValueWithVariable
     ;
 
 objectField
-    : NAME ':' value
+    : anyName ':' value
     ;
 
 objectFieldWithVariable
-    : NAME ':' valueWithVariable
+    : anyName ':' valueWithVariable
     ;
 
 directives
@@ -167,7 +163,7 @@ directives
     ;
 
 directive
-    : '@' NAME arguments?
+    : '@' anyName arguments?
     ;
 
 type
@@ -177,7 +173,7 @@ type
     ;
 
 typeName
-    : NAME;
+    : anyName;
 
 listType
     : '[' type ']'
@@ -188,24 +184,40 @@ nonNullType
     | listType '!'
     ;
 
-// --------------- TOKENS ---------------
+// --------------- BOOLEAN---------------
 
 BooleanValue
     : 'true'
     | 'false';
 
-name
+// --------------- NAMES ---------------
+
+anyName
     : NAME
-    | 'on'
-    | 'fragment'
-    | 'query'
-    | 'mutation'
-    | 'subscription'
+    | K_ON
+    | K_FRAGMENT
+    | K_QUERY
+    | K_MUTATION
+    | K_SUBSCRIPTION
     ;
 
-NAME
-    : [_A-Za-z][_0-9A-Za-z]*
+fragmentName
+    : NAME
+    | K_FRAGMENT
+    | K_QUERY
+    | K_MUTATION
+    | K_SUBSCRIPTION
     ;
+
+K_ON : 'on' ;
+K_FRAGMENT : 'fragment' ;
+K_QUERY : 'query' ;
+K_MUTATION : 'mutation' ;
+K_SUBSCRIPTION : 'subscription' ;
+
+NAME : [_A-Za-z][_0-9A-Za-z]* ;
+
+// --------------- INTEGER ---------------
 
 IntValue
     : Sign? IntegerPart
@@ -236,6 +248,8 @@ ExponentPart
 Digit
     : '0'..'9'
     ;
+
+// --------------- STRING ---------------
 
 StringValue
     : '"' (~(["\\\n\r\u2028\u2029])|EscapedChar)* '"'
