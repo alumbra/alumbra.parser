@@ -44,13 +44,17 @@ definition
 
 operationDefinition
     : selectionSet
-    | operationType  NAME? variableDefinitions? directives? selectionSet
+    | operationType  operationName? variableDefinitions? directives? selectionSet
     ;
 
 operationType
     : K_QUERY
     | K_MUTATION
     | K_SUBSCRIPTION
+    ;
+
+operationName
+    : NAME
     ;
 
 variableDefinitions
@@ -62,7 +66,7 @@ variableDefinition
     ;
 
 variable
-    : '$' NAME
+    : '$' anyName
     ;
 
 defaultValue
@@ -80,11 +84,15 @@ selection
     ;
 
 field
-    : alias? anyName arguments? directives? selectionSet?
+    : fieldAlias? fieldName arguments? directives? selectionSet?
     ;
 
-alias
+fieldAlias
     : anyName  ':'
+    ;
+
+fieldName
+    : anyName
     ;
 
 arguments
@@ -112,23 +120,35 @@ typeCondition
     ;
 
 value
-    : IntValue
-    | FloatValue
+    : intValue
+    | floatValue
     | StringValue
-    | BooleanValue
+    | booleanValue
     | enumValue
     | arrayValue
     | objectValue;
 
 valueWithVariable
     : variable
-    | IntValue
-    | FloatValue
+    | intValue
+    | floatValue
     | StringValue
-    | BooleanValue
+    | booleanValue
     | enumValue
     | arrayValueWithVariable
     | objectValueWithVariable;
+
+intValue
+    : IntValue
+    ;
+
+floatValue
+    : FloatValue
+    ;
+
+booleanValue
+    : BooleanValue
+    ;
 
 enumValue
     : anyName
