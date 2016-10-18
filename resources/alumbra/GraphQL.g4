@@ -289,7 +289,7 @@ fragment Hex
 // --------------- IGNORED ---------------
 
 Ignored
-    : (Whitspace|Comma|LineTerminator|Comment) -> skip
+    : (Whitspace|Comma|LineTerminator|Comment) -> channel(HIDDEN)
     ;
 
 fragment Comment
