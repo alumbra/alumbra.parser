@@ -7,6 +7,24 @@
 (s/def :graphql/name
   (s/and string? #(re-matches #"[_a-zA-Z][_0-9a-zA-Z]*" %)))
 
+(s/def :graphql/fragment-name
+  :graphql/name)
+
+(s/def :graphql/fragment-type
+  :graphql/name)
+
+(s/def :graphql/field-name
+  :graphql/name)
+
+(s/def :graphql/field-alias
+  :graphql/name)
+
+(s/def :graphql/enum-name
+  :graphql/name)
+
+(s/def :graphql/operation-name
+  :graphql/name)
+
 ;; ## Values
 
 (s/def :graphql/value
@@ -16,14 +34,8 @@
         :string   string?
         :boolean  :graphql/boolean
         :enum     :graphql/enum
-        :list     :graphql/list
-        :object   :graphql/object))
-
-(s/def :graphql/variable
-  (s/keys :req [:variable/name]))
-
-(s/def :variable/name
-  :graphql/name)
+        :object   :graphql/object
+        :list     :graphql/list))
 
 (s/def :graphql/boolean
   (s/with-gen
@@ -31,10 +43,7 @@
     #(gen/elements [true false])))
 
 (s/def :graphql/enum
-  (s/keys :req [:enum/name]))
-
-(s/def :enum/name
-  :graphql/name)
+  (s/keys :req [:graphql/enum-name]))
 
 (s/def :graphql/list
   (s/with-gen
@@ -51,82 +60,40 @@
             0 3)
           (gen/fmap (partial into {})))))
 
-;; ## Definitions
+;; ## Variables
 
-(s/def :graphql/definition
-  (s/or :operation :graphql/operation
-        :fragment  :graphql/fragment))
+(s/def :graphql/variable-name
+  :graphql/name)
 
-;; ## Operation
+(s/def :graphql/variable
+  (s/keys :req [:graphql/variable-name]))
 
-(s/def :graphql/operation
-  (s/keys :req [:graphql/selection-set]
-          :opt [:operation/name
-                :operation/type
-                :operation/variables
-                :graphql/directives]))
+(s/def :graphql/variable-definition
+  (s/keys :req [:graphql/variable-name
+                :graphql/type]
+          :opt [:graphql/default-value]))
 
-;; ## Selection Set
-
-(s/def :graphql/selection-set
+(s/def :graphql/variables
   (s/with-gen
-    (s/coll-of :graphql/selection)
-    #(gen/vector (s/gen :graphql/selection) 1 2)))
+    (s/coll-of :graphql/variable-definition)
+    #(gen/vector (s/gen :graphql/variable) 1 3)))
 
-(s/def :graphql/selection
-  (s/or :field           :selection/field
-        :fragment-spread :selection/fragment-spread
-        :inline-fragment :selection/inline-fragment))
+;; ## Types
 
-(s/def :selection/field
-  (s/keys :req [:field/name]
-          :opt [:field/alias
-                :graphql/arguments
-                :graphql/directives
-                :graphql/selection-set]))
+(s/def :graphql/type
+  (s/or :type :graphql/named-type
+        :list :graphql/list-type))
 
-(s/def :field/name
-  :graphql/name)
+(s/def :graphql/list-type
+  (s/keys :req [:graphql/type
+                :graphql/non-null?]))
 
-(s/def :field/alias
-  :graphql/name)
+(s/def :graphql/named-type
+  (s/keys :req [:graphql/type-name
+                :graphql/non-null?]))
 
-(s/def :selection/fragment-spread
-  (s/keys :req [:fragment/name]
-          :opt [:graphql/directives]))
-
-(s/def :selection/inline-fragment
-  (s/keys :req [:graphql/selection-set]
-          :opt [:graphql/directives
-                :fragment/type]))
-
-;; ## Fragments
-
-(s/def :graphql/fragment
-  (s/keys :req [:fragment/name
-                :fragment/type
-                :graphql/selection-set]
-          :opt [:graphql/directives]))
-
-(s/def :fragment/name
-  :graphql/name)
-
-(s/def :fragment/type
-  :graphql/name)
-
-;; ## Directives
-
-(s/def :graphql/directives
-  (s/with-gen
-    (s/coll-of :graphql/directive)
-    #(gen/vector (s/gen :graphql/directive) 1 2)))
-
-(s/def :graphql/directive
-  (s/keys :req [:directive/name]
-          :opt [:graphql/arguments]))
-
-(s/def :directive/name
-  :graphql/name)
+(s/def :graphql/non-null?
+  :graphql/boolean)
 
 ;; ## Arguments
 
@@ -136,11 +103,85 @@
     #(gen/vector (s/gen :graphql/argument) 1 3)))
 
 (s/def :graphql/argument
-  (s/keys :req [:argument/name
-                :argument/value]))
+  (s/keys :req [:graphql/argument-name
+                :graphql/argument-value]))
 
-(s/def :argument/name
+(s/def :graphql/argument-name
   :graphql/name)
 
-(s/def :argument/value
+(s/def :graphql/argument-value
   :graphql/value)
+
+;; ## Directives
+
+(s/def :graphql/directives
+  (s/with-gen
+    (s/coll-of :graphql/directive)
+    #(gen/vector (s/gen :graphql/directive) 1 2)))
+
+(s/def :graphql/directive
+  (s/keys :req [:graphql/directive-name]
+          :opt [:graphql/arguments]))
+
+(s/def :graphql/directive-name
+  :graphql/name)
+
+;; ## Selection Set
+
+(s/def :graphql/selection-set
+  (s/with-gen
+    (s/coll-of :graphql/selection)
+    #(gen/vector (s/gen :graphql/selection) 1 2)))
+
+(s/def :graphql/selection
+  (s/or :field           :graphql/field
+        :fragment-spread :graphql/fragment-spread
+        :inline-fragment :graphql/inline-fragment))
+
+(s/def :graphql/field
+  (s/keys :req [:graphql/field-name]
+          :opt [:graphql/field-alias
+                :graphql/arguments
+                :graphql/directives
+                :graphql/selection-set]))
+
+(s/def :graphql/fragment-spread
+  (s/keys :req [:graphql/fragment-name]
+          :opt [:graphql/directives]))
+
+(s/def :graphql/inline-fragment
+  (s/keys :req [:graphql/selection-set]
+          :opt [:graphql/directives
+                :graphql/fragment-type]))
+
+;; ## Document
+
+(s/def :graphql/document
+  (s/keys :opt [:graphql/operations
+                :graphql/fragments]))
+
+;; ### Operation
+
+(s/def :graphql/operations
+  (s/coll-of :graphql/operation))
+
+(s/def :graphql/operation
+  (s/keys :req [:graphql/selection-set]
+          :opt [:graphql/operation-name
+                :graphql/operation-type
+                :graphql/variables
+                :graphql/directives]))
+
+(s/def :graphql/operation-type
+  #{"mutation" "query" "subscription"})
+
+;; ### Fragments
+
+(s/def :graphql/fragments
+  (s/coll-of :graphql/fragment))
+
+(s/def :graphql/fragment
+  (s/keys :req [:graphql/fragment-name
+                :graphql/fragment-type
+                :graphql/selection-set]
+          :opt [:graphql/directives]))

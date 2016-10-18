@@ -3,7 +3,6 @@
              [clojure-test :refer [defspec]]
              [generators :as gen]
              [properties :as prop]]
-            [clojure.test :refer :all]
             [alumbra.generators :as g]
             [alumbra.parser.antlr :as antlr]))
 
