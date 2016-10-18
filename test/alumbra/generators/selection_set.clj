@@ -10,7 +10,7 @@
 (declare -selection-set)
 
 (def -type-condition
-  (gen/fmap #(str "on " %) -name))
+  (gen/fmap #(str "on " (string/capitalize %)) -name))
 
 (def -fragment-spread
   (gen/let [n (gen/such-that #(not= % "on") -name)
