@@ -6,7 +6,7 @@
             :author "Yannick Scherer"
             :year 2016
             :key "mit"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
+                 [org.clojure/test.check "0.9.0"]
                  [clj-antlr "0.2.3"]]
-  :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]]}}
   :pedantic? :abort)
