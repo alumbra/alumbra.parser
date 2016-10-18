@@ -1,13 +1,14 @@
 (ns alumbra.generators
   (:require [clojure.test.check.generators :as gen]
             [alumbra.generators
+             [fragments :refer [-fragment-definition]]
              [operations :refer [-operation-definition]]]
             [clojure.string :as string]))
 
 (def definition
   (gen/one-of
     [-operation-definition
-     #_fragment-definition]))
+     -fragment-definition]))
 
 (def document
   (->> (gen/vector definition 1 5)
