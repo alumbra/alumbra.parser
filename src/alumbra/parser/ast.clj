@@ -1,5 +1,23 @@
 (ns alumbra.parser.ast)
 
+;; ## Helper
+
+(defn- attach-position
+  [value form]
+  {:pre [(map? value)]}
+  (if-let [{:keys [antlr/row antlr/column antlr/index]}
+           (some-> form meta :antlr/start)]
+    (assoc value
+           :alumbra.parser/metadata
+           {:alumbra.parser/row    row
+            :alumbra.parser/column column
+            :alumbra.parser/index  index})
+    value))
+
+(defn- attach-positions
+  [forms values]
+  (map attach-position values forms))
+
 ;; ## Traverse AST
 
 (defmulti ^:private traverse*
@@ -19,14 +37,18 @@
 ;; ### Document
 
 (defmethod traverse* :document
-  [state [_ & definitions]]
-  (traverse-all* state (mapv second definitions)))
+  [state [_ & definitions :as form]]
+  (attach-position
+    (->> (mapv second definitions)
+         (traverse-all* state))
+    form))
 
 ;; ### Operation
 
 (defmethod traverse* :operationDefinition
-  [state [_ & body]]
-  (let [data (traverse-all* {} body)]
+  [state [_ & body :as form]]
+  (let [data (-> (traverse-all* {} body)
+                 (attach-position form))]
     (update state :graphql/operations (fnil conj []) data)))
 
 (defmethod traverse* :operationType
@@ -40,8 +62,9 @@
 ;; ### Fragment
 
 (defmethod traverse* :fragmentDefinition
-  [state [_ _ & body]]
-  (let [data (traverse-all* {} body)]
+  [state [_ _ & body :as form]]
+  (let [data (-> (traverse-all* {} body)
+                 (attach-position form))]
     (update state :graphql/fragments (fnil conj []) data)))
 
 (defmethod traverse* :typeCondition
@@ -57,8 +80,9 @@
     (assoc state :graphql/selection-set data)))
 
 (defmethod traverse* :field
-  [state [_ & body]]
-  (let [data (traverse-all* {} body)]
+  [state [_ & body :as form]]
+  (let [data (-> (traverse-all* {} body)
+                 (attach-position form))]
     (conj state data)))
 
 (defmethod traverse* :fieldAlias
@@ -70,8 +94,9 @@
   (assoc state :graphql/field-name a))
 
 (defmethod traverse* :fragmentSpread
-  [state [_ _ & body]]
-  (let [data (traverse-all* {} body)]
+  [state [_ _ & body :as form]]
+  (let [data (-> (traverse-all* {} body)
+                 (attach-position form))]
     (conj state data)))
 
 (defmethod traverse* :fragmentName
@@ -79,8 +104,9 @@
   (assoc state :graphql/fragment-name n))
 
 (defmethod traverse* :inlineFragment
-  [state [_ _ & body]]
-  (let [data (traverse-all* {} body)]
+  [state [_ _ & body :as form]]
+  (let [data (-> (traverse-all* {} body)
+                 (attach-position form))]
     (conj state data)))
 
 ;; ### Directives
@@ -91,9 +117,10 @@
     (assoc state :graphql/directives data)))
 
 (defmethod traverse* :directive
-  [state [_ _ [_ directive-name] & body]]
+  [state [_ _ [_ directive-name] & body :as form]]
   (let [data (-> (traverse-all* {} body)
-                 (assoc :graphql/directive-name directive-name))]
+                 (assoc :graphql/directive-name directive-name)
+                 (attach-position form))]
     (conj state data)))
 
 ;; ### Arguments
@@ -105,20 +132,22 @@
     (assoc state :graphql/arguments data)))
 
 (defmethod traverse* :argument
-  [state [_ [_ argument-name] _ argumentValue]]
-  (conj state {:graphql/argument-name argument-name
-               :graphql/argument-value (traverse* {} argumentValue)}))
+  [state [_ [_ argument-name] _ argumentValue :as form]]
+  (conj state
+        (-> {:graphql/argument-name argument-name
+             :graphql/argument-value (traverse* {} argumentValue)}
+            (attach-position form))))
 
 ;; ### Values
 
 (defmethod traverse* :valueWithVariable
-  [state [_ v]]
+  [state [_ v :as form]]
   (if (sequential? v)
     (traverse* state v)
     v))
 
 (defmethod traverse* :value
-  [state [_ v]]
+  [state [_ v :as form]]
   (if (sequential? v)
     (traverse* state v)
     v))
@@ -136,8 +165,10 @@
   (= v "true"))
 
 (defmethod traverse* :enumValue
-  [state [_ [_ n]]]
-  (assoc state :graphql/enum-name n))
+  [state [_ [_ n] :as form]]
+  (-> state
+      (assoc :graphql/enum-name n)
+      (attach-position form)))
 
 (defmethod traverse* :arrayValueWithVariable
   [state [_ _ & values-plus-paren]]
@@ -170,8 +201,10 @@
 ;; ## Variable
 
 (defmethod traverse* :variable
-  [state [_ _ [_ n]]]
-  (assoc state :graphql/variable-name n))
+  [state [_ _ [_ n] :as form]]
+  (-> state
+      (assoc :graphql/variable-name n)
+      (attach-position form)))
 
 (defmethod traverse* :variableDefinitions
   [state [_ _ & definitions-plus-paren]]
@@ -193,10 +226,12 @@
 ;; ## Types
 
 (defmethod traverse* :type
-  [state [_ t]]
+  [state [_ t :as form]]
   (assoc state
          :graphql/type
-         (traverse* {:graphql/non-null? false} t)))
+         (-> {:graphql/non-null? false}
+             (traverse* t)
+             (attach-position form))))
 
 (defmethod traverse* :typeName
   [state [_ [_ n]]]
