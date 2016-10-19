@@ -17,3 +17,18 @@
       (when-not (antlr/error? ast)
         (->> (ast/transform ast)
              (s/valid? :graphql/document))))))
+
+(defspec t-transform-produces-metadata-in-all-maps 500
+  (prop/for-all
+    [document g/document]
+    (let [ast (antlr/parse document)]
+      (when-not (antlr/error? ast)
+        (->> (ast/transform ast)
+             (tree-seq
+               coll?
+               (fn [m]
+                 (if (map? m)
+                   (seq (dissoc m :graphql/metadata))
+                   m)))
+             (filter map?)
+             (every? :graphql/metadata))))))

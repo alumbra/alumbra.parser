@@ -8,15 +8,11 @@
   (if-let [{:keys [antlr/row antlr/column antlr/index]}
            (some-> form meta :antlr/start)]
     (assoc value
-           :alumbra.parser/metadata
-           {:alumbra.parser/row    row
-            :alumbra.parser/column column
-            :alumbra.parser/index  index})
+           :graphql/metadata
+           {:row    row
+            :column column
+            :index  index})
     value))
-
-(defn- attach-positions
-  [forms values]
-  (map attach-position values forms))
 
 ;; ## Traverse AST
 
@@ -140,63 +136,69 @@
 
 ;; ### Values
 
-(defmethod traverse* :valueWithVariable
-  [state [_ v :as form]]
-  (if (sequential? v)
-    (traverse* state v)
-    v))
-
 (defmethod traverse* :value
   [state [_ v :as form]]
-  (if (sequential? v)
-    (traverse* state v)
-    v))
+  (-> (if (= (first v) :variable)
+        (traverse* state [:variableValue v])
+        (traverse* state v))
+      (attach-position form)))
+
+(defmethod traverse* :variableValue
+  [state [_ v]]
+  (assoc state
+         :graphql/value-type :variable
+         :graphql/variable (traverse* {} v)))
 
 (defmethod traverse* :intValue
   [state [_ v]]
-  (Long. v))
+  (assoc state
+          :graphql/value-type :integer
+          :graphql/integer    (Long. v)))
 
 (defmethod traverse* :floatValue
   [state [_ v]]
-  (Double. v))
+  (assoc state
+         :graphql/value-type :float
+         :graphql/float      (Double. v)))
+
+(defmethod traverse* :stringValue
+  [state [_ v]]
+  (assoc state
+         :graphql/value-type :string
+         :graphql/string     v))
 
 (defmethod traverse* :booleanValue
   [state [_ v]]
-  (= v "true"))
+  (assoc state
+         :graphql/value-type :boolean
+         :graphql/boolean    (= v "true")))
 
 (defmethod traverse* :enumValue
   [state [_ [_ n] :as form]]
-  (-> state
-      (assoc :graphql/enum-name n)
-      (attach-position form)))
-
-(defmethod traverse* :arrayValueWithVariable
-  [state [_ _ & values-plus-paren]]
-  (let [values (butlast values-plus-paren)]
-    (mapv #(traverse* {} %) values)))
-
-(defmethod traverse* :objectValueWithVariable
-  [state [_ _ & fields-plus-paren]]
-  (let [fields (butlast fields-plus-paren)]
-    (traverse-all* {} fields)))
-
-(defmethod traverse* :objectFieldWithVariable
-  [state [_ [_ field-name] _ field-value]]
-  (assoc state field-name (traverse* {} field-value)))
+  (assoc state
+         :graphql/value-type :enum
+         :graphql/enum n))
 
 (defmethod traverse* :arrayValue
   [state [_ _ & values-plus-paren]]
   (let [values (butlast values-plus-paren)]
-    (mapv #(traverse* {} %) values)))
+    (assoc state
+           :graphql/value-type :list
+           :graphql/list       (mapv #(traverse* {} %) values))))
 
 (defmethod traverse* :objectValue
   [state [_ _ & fields-plus-paren]]
   (let [fields (butlast fields-plus-paren)]
-    (traverse-all* {} fields)))
+    (assoc state
+          :graphql/value-type    :object
+          :graphql/object-fields (mapv #(traverse* {} %) fields))))
 
 (defmethod traverse* :objectField
-  [state [_ [_ field-name] _ field-value]]
-  (assoc state field-name (traverse* {} field-value)))
+  [state [_ [_ field-name] _ field-value :as form]]
+  (-> state
+      (assoc :graphql/field-name field-name
+             :graphql/value      (traverse* {} field-value))
+      (attach-position form)))
 
 ;; ## Variable
 
