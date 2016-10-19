@@ -122,7 +122,7 @@ typeCondition
 value
     : intValue
     | floatValue
-    | StringValue
+    | stringValue
     | booleanValue
     | enumValue
     | arrayValue
@@ -132,7 +132,7 @@ valueWithVariable
     : variable
     | intValue
     | floatValue
-    | StringValue
+    | stringValue
     | booleanValue
     | enumValue
     | arrayValueWithVariable
@@ -148,6 +148,10 @@ floatValue
 
 booleanValue
     : BooleanValue
+    ;
+
+stringValue
+    : StringValue
     ;
 
 enumValue

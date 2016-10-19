@@ -16,11 +16,20 @@
 
 ;; ## Coercion
 
+(def ^:private sexpr-key-mapping
+  #(get
+     {:valueWithVariable       :value
+      :arrayValueWithVariable  :arrayValue
+      :objectValueWithVariable :objectValue
+      :objectFieldWithVariable :objectField}
+     % %))
+
 (defn- sexpr-key
   [^ParserRuleContext t ^Parser p]
   (->> (.getRuleIndex t)
        (antlr-common/parser-rule-name p)
-       (antlr-common/fast-keyword)))
+       (antlr-common/fast-keyword)
+       (sexpr-key-mapping)))
 
 (defn- token->position
   [^Token t k]
