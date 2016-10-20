@@ -2,8 +2,8 @@
   "GraphQL Parsing API"
   (:require [alumbra.parser
              [antlr :as antlr]
-             [ast :as ast]
-             spec]
+             [document :as document]]
+            [alumbra.spec document]
             [clojure.spec :as s]))
 
 ;; ## Public API
@@ -32,16 +32,16 @@
   {:pre [(error? error-value)]}
   @error-value)
 
-(defn parse
+(defn parse-document
   "Parse a GraphQL document and return its in-memory representation, conforming
    to the `:graphql/document` spec.
 
    If the parser fails, an error container is returned that can be checked for
    using [[error?]]."
   [document]
-  (let [result (antlr/parse-document document)]
-    (if-not (antlr/error? result)
-      (ast/transform result)
+  (let [result (document/parse document)]
+    (if-not (error? result)
+      (document/transform result)
       result)))
 
 ;; ## Specs

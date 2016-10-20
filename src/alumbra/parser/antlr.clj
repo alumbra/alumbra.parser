@@ -56,7 +56,7 @@
 
 ;; ## Parser
 
-(defn- make-parser
+(defn make-parser
   [{:keys [grammar root aliases]}]
   (-> grammar
       (io/resource)
@@ -65,22 +65,13 @@
         {:root   root
          :format #(node->sexpr aliases %)})))
 
-(defmacro ^:private defparser
+(defmacro defparser
   [sym docstring opts]
   `(let [f# (make-parser ~opts)]
      (defn ~sym
        ~docstring
        [~'data]
        (f# ~'data))))
-
-(defparser parse-document
-  "Parse a GraphQL document."
-  {:grammar "alumbra/GraphQL.g4"
-   :root    "document"
-   :aliases {:valueWithVariable       :value
-             :arrayValueWithVariable  :arrayValue
-             :objectValueWithVariable :objectValue
-             :objectFieldWithVariable :objectField}})
 
 ;; ## Error Container
 

@@ -1,4 +1,17 @@
-(ns alumbra.parser.ast)
+(ns alumbra.parser.document
+  (:require [alumbra.parser.antlr :as antlr]
+            [alumbra.spec document]))
+
+;; ## Parser
+
+(antlr/defparser parse
+  "Parse a GraphQL document."
+  {:grammar "alumbra/GraphQL.g4"
+   :root    "document"
+   :aliases {:valueWithVariable       :value
+             :arrayValueWithVariable  :arrayValue
+             :objectValueWithVariable :objectValue
+             :objectFieldWithVariable :objectField}})
 
 ;; ## Helper
 

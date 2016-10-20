@@ -1,4 +1,4 @@
-(ns alumbra.parser.spec
+(ns alumbra.spec.document
   (:require [clojure.spec :as s]
             [clojure.test.check.generators :as gen]))
 

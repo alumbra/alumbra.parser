@@ -1,29 +1,34 @@
-(ns alumbra.parser.ast-test
+(ns alumbra.parser.document-test
   (:require [clojure.test.check
              [clojure-test :refer [defspec]]
              [generators :as gen]
              [properties :as prop]]
             [clojure.spec :as s]
-            [alumbra.generators :as g]
+            [alumbra.generators.document :as g]
             [alumbra.parser
              [antlr :as antlr]
-             [ast :as ast]
-             [spec :as qls]]))
+             [document :as document]]))
 
-(defspec t-transform 500
+(defspec t-parse-accepts-valid-queries 500
   (prop/for-all
-    [document g/document]
-    (let [ast (antlr/parse-document document)]
+    [document g/-document]
+    (let [ast (document/parse document)]
+      (not (antlr/error? ast)))))
+
+(defspec t-transform-conforms-to-spec 500
+  (prop/for-all
+    [document g/-document]
+    (let [ast (document/parse document)]
       (when-not (antlr/error? ast)
-        (->> (ast/transform ast)
+        (->> (document/transform ast)
              (s/valid? :graphql/document))))))
 
 (defspec t-transform-produces-metadata-in-all-maps 500
   (prop/for-all
-    [document g/document]
-    (let [ast (antlr/parse-document document)]
+    [document g/-document]
+    (let [ast (document/parse document)]
       (when-not (antlr/error? ast)
-        (->> (ast/transform ast)
+        (->> (document/transform ast)
              (tree-seq
                coll?
                (fn [m]
