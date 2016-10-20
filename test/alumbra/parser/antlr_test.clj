@@ -6,8 +6,8 @@
             [alumbra.generators :as g]
             [alumbra.parser.antlr :as antlr]))
 
-(defspec t-parse 500
+(defspec t-parse-document 500
   (prop/for-all
     [document g/document]
-    (let [result (antlr/parse document)]
+    (let [result (antlr/parse-document document)]
       (not (antlr/error? result)))))

@@ -13,7 +13,7 @@
 (defspec t-transform 500
   (prop/for-all
     [document g/document]
-    (let [ast (antlr/parse document)]
+    (let [ast (antlr/parse-document document)]
       (when-not (antlr/error? ast)
         (->> (ast/transform ast)
              (s/valid? :graphql/document))))))
@@ -21,7 +21,7 @@
 (defspec t-transform-produces-metadata-in-all-maps 500
   (prop/for-all
     [document g/document]
-    (let [ast (antlr/parse document)]
+    (let [ast (antlr/parse-document document)]
       (when-not (antlr/error? ast)
         (->> (ast/transform ast)
              (tree-seq

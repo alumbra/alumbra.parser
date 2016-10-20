@@ -39,7 +39,7 @@
    If the parser fails, an error container is returned that can be checked for
    using [[error?]]."
   [document]
-  (let [result (antlr/parse document)]
+  (let [result (antlr/parse-document document)]
     (if-not (antlr/error? result)
       (ast/transform result)
       result)))

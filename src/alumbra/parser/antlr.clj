@@ -16,20 +16,11 @@
 
 ;; ## Coercion
 
-(def ^:private sexpr-key-mapping
-  #(get
-     {:valueWithVariable       :value
-      :arrayValueWithVariable  :arrayValue
-      :objectValueWithVariable :objectValue
-      :objectFieldWithVariable :objectField}
-     % %))
-
-(defn- sexpr-key
+(defn- sexpr-head
   [^ParserRuleContext t ^Parser p]
   (->> (.getRuleIndex t)
        (antlr-common/parser-rule-name p)
-       (antlr-common/fast-keyword)
-       (sexpr-key-mapping)))
+       (antlr-common/fast-keyword)))
 
 (defn- token->position
   [^Token t k]
@@ -47,35 +38,51 @@
           :antlr/stop (token->position stop-token :stop)}
          (with-meta sexpr))))
 
-(defn- sexpr-with-meta
-  [^ParseTree t ^Parser p]
+(defn- node->sexpr*
+  [aliases ^ParseTree t ^Parser p]
   (if (instance? ParserRuleContext t)
-    (->> (antlr-common/children t)
-         (mapv #(sexpr-with-meta % p))
-         (cons (sexpr-key t p))
-         (attach-meta t))
+    (let [k (sexpr-head t p)]
+      (->> (antlr-common/children t)
+           (mapv #(node->sexpr* aliases % p))
+           (cons (get aliases k k))
+           (attach-meta t)))
     (.getText t)))
 
-(defn- tree->sexpr-with-meta
-  [{:keys [tree parser errors]}]
+(defn- node->sexpr
+  [aliases {:keys [tree parser errors]}]
   (if (seq errors)
     (antlr-common/parse-error errors tree)
-    (sexpr-with-meta tree parser)))
+    (node->sexpr* aliases tree parser)))
 
-;; ## Parser + Error Container
+;; ## Parser
 
-(def parser
-  (-> "alumbra/GraphQL.g4"
+(defn- make-parser
+  [{:keys [grammar root aliases]}]
+  (-> grammar
       (io/resource)
       (slurp)
       (antlr/parser
-        {:root   "document"
-         :format tree->sexpr-with-meta})))
+        {:root   root
+         :format #(node->sexpr aliases %)})))
 
-(defn parse
+(defmacro ^:private defparser
+  [sym docstring opts]
+  `(let [f# (make-parser ~opts)]
+     (defn ~sym
+       ~docstring
+       [~'data]
+       (f# ~'data))))
+
+(defparser parse-document
   "Parse a GraphQL document."
-  [document]
-  (parser document))
+  {:grammar "alumbra/GraphQL.g4"
+   :root    "document"
+   :aliases {:valueWithVariable       :value
+             :arrayValueWithVariable  :arrayValue
+             :objectValueWithVariable :objectValue
+             :objectFieldWithVariable :objectField}})
+
+;; ## Error Container
 
 (defn error?
   "Check whether the given value represents a parser failure
