@@ -63,6 +63,7 @@
       (slurp)
       (antlr/parser
         {:root   root
+         :throw? false
          :format #(node->sexpr aliases %)})))
 
 (defmacro defparser
