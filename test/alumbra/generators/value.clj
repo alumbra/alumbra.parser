@@ -7,11 +7,10 @@
   gen/int)
 
 (def -digits
-  (->> "0123456789"
-       (gen/elements)
-       (gen/vector)
-       (gen/not-empty)
-       (gen/fmap #(apply str %))))
+  (as-> "0123456789" <>
+    (gen/elements <>)
+    (gen/vector <> 1 8)
+    (gen/fmap #(apply str %) <>)))
 
 (def -exponent
   (gen/let [digits -digits

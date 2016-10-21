@@ -125,7 +125,7 @@ inputTypeDefinition
     ;
 
 inputTypeField
-    : fieldName ':' typeName
+    : fieldName ':' type
     ;
 
 // --------------- DIRECTIVES ---------------
