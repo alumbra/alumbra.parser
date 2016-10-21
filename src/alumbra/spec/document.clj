@@ -35,7 +35,8 @@
   (s/coll-of :graphql/operation))
 
 (s/def :graphql/operation
-  (s/keys :req [:graphql/selection-set]
+  (s/keys :req [:graphql/selection-set
+                :graphql/metadata]
           :opt [:graphql/operation-name
                 :graphql/operation-type
                 :graphql/variables
@@ -75,7 +76,8 @@
         :inline-fragment :graphql/inline-fragment))
 
 (s/def :graphql/field
-  (s/keys :req [:graphql/field-name]
+  (s/keys :req [:graphql/field-name
+                :graphql/metadata]
           :opt [:graphql/field-alias
                 :graphql/arguments
                 :graphql/directives
@@ -88,11 +90,13 @@
   :graphql/name)
 
 (s/def :graphql/fragment-spread
-  (s/keys :req [:graphql/fragment-name]
+  (s/keys :req [:graphql/fragment-name
+                :graphql/metadata]
           :opt [:graphql/directives]))
 
 (s/def :graphql/inline-fragment
-  (s/keys :req [:graphql/selection-set]
+  (s/keys :req [:graphql/selection-set
+                :graphql/metadata]
           :opt [:graphql/directives
                 :graphql/type-condition]))
 
@@ -200,11 +204,13 @@
   :graphql/name)
 
 (s/def :graphql/variable
-  (s/keys :req [:graphql/variable-name]))
+  (s/keys :req [:graphql/variable-name
+                :graphql/metadata]))
 
 (s/def :graphql/variable-definition
   (s/keys :req [:graphql/variable-name
-                :graphql/type]
+                :graphql/type
+                :graphql/metadata]
           :opt [:graphql/default-value]))
 
 (s/def :graphql/default-value
@@ -227,11 +233,13 @@
 
 (s/def :graphql/list-type
   (s/keys :req [:graphql/type
-                :graphql/non-null?]))
+                :graphql/non-null?
+                :graphql/metadata]))
 
 (s/def :graphql/named-type
   (s/keys :req [:graphql/type-name
-                :graphql/non-null?]))
+                :graphql/non-null?
+                :graphql/metadata]))
 
 (s/def :graphql/type-name
   :graphql/name)
@@ -248,7 +256,8 @@
 
 (s/def :graphql/argument
   (s/keys :req [:graphql/argument-name
-                :graphql/argument-value]))
+                :graphql/argument-value
+                :graphql/metadata]))
 
 (s/def :graphql/argument-name
   :graphql/name)
@@ -264,7 +273,8 @@
     #(gen/vector (s/gen :graphql/directive) 1 2)))
 
 (s/def :graphql/directive
-  (s/keys :req [:graphql/directive-name]
+  (s/keys :req [:graphql/directive-name
+                :graphql/metadata]
           :opt [:graphql/arguments]))
 
 (s/def :graphql/directive-name
