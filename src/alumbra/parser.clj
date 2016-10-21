@@ -46,7 +46,7 @@
 
 ;; ## Specs
 
-(s/fdef parse
+(s/fdef parse-document
         :args (s/alt :string string?)
         :ret (s/alt :document :graphql/document
                     :error     error?))
