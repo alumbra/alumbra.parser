@@ -96,6 +96,7 @@
 (s/def :graphql/inline-fragment
   (s/keys :req [:graphql/selection-set]
           :opt [:graphql/directives
+                :graphql/type-condititon
                 :graphql/fragment-type]))
 
 ;; ## Values
@@ -220,6 +221,10 @@
 (s/def :graphql/type
   (s/or :type :graphql/named-type
         :list :graphql/list-type))
+
+(s/def :graphql/type-condition
+  (s/keys :req [:graphql/type-name
+                :graphql/metadata]))
 
 (s/def :graphql/list-type
   (s/keys :req [:graphql/type
