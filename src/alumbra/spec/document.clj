@@ -54,14 +54,12 @@
 
 (s/def :graphql/fragment
   (s/keys :req [:graphql/fragment-name
-                :graphql/fragment-type
-                :graphql/selection-set]
+                :graphql/type-condition
+                :graphql/selection-set
+                :graphql/metadata]
           :opt [:graphql/directives]))
 
 (s/def :graphql/fragment-name
-  :graphql/name)
-
-(s/def :graphql/fragment-type
   :graphql/name)
 
 ;; ### Selection Set
@@ -96,8 +94,7 @@
 (s/def :graphql/inline-fragment
   (s/keys :req [:graphql/selection-set]
           :opt [:graphql/directives
-                :graphql/type-condititon
-                :graphql/fragment-type]))
+                :graphql/type-condition]))
 
 ;; ## Values
 

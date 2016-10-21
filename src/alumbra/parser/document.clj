@@ -77,8 +77,11 @@
     (update state :graphql/fragments (fnil conj []) data)))
 
 (defmethod traverse* :typeCondition
-  [state [_ _ [_ [_ n]]]]
-  (assoc state :graphql/fragment-type n))
+  [state [_ _ [_ [_ n]] :as form]]
+  (assoc state
+         :graphql/type-condition
+         (-> {:graphql/type-name n}
+             (attach-position form))))
 
 ;; ### Selection Set
 
