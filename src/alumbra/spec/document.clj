@@ -123,7 +123,9 @@
     #(gen/vector (s/gen :graphql/value) 0 3)))
 
 (s/def :graphql/object-fields
-  (s/coll-of :graphql/object-field))
+  (s/with-gen
+    (s/coll-of :graphql/object-field)
+    #(gen/vector (s/gen :graphql/object-field) 1 3)))
 
 (s/def :graphql/object-field
   (s/keys :req [:graphql/field-name

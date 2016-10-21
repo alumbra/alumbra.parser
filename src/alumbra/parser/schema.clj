@@ -1,6 +1,6 @@
 (ns alumbra.parser.schema
   (:require [alumbra.parser.antlr :as antlr]
-            #_[alumbra.spec schema]))
+            [alumbra.spec schema]))
 
 ;; ## Parser
 
