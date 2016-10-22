@@ -62,7 +62,7 @@
           :opt [:graphql/directives]))
 
 (s/def :graphql/fragment-name
-  :graphql/name)
+  (s/and :graphql/name #(not= % "on")))
 
 ;; ### Selection Set
 
