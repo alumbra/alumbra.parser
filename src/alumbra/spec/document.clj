@@ -36,9 +36,9 @@
 
 (s/def :graphql/operation
   (s/keys :req [:graphql/selection-set
+                :graphql/operation-type
                 :graphql/metadata]
           :opt [:graphql/operation-name
-                :graphql/operation-type
                 :graphql/variables
                 :graphql/directives]))
 

@@ -56,7 +56,9 @@
 
 (defmethod traverse* :operationDefinition
   [state [_ & body :as form]]
-  (let [data (-> (traverse-all* {} body)
+  (let [data (-> (traverse-all*
+                   {:graphql/operation-type "query"}
+                   body)
                  (attach-position form))]
     (update state :graphql/operations (fnil conj []) data)))
 
