@@ -1,14 +1,13 @@
 (ns alumbra.spec.schema
   (:require [clojure.spec :as s]
-            [clojure.test.check.generators :as gen]
             [alumbra.spec document]))
 
 ;; ## Schema
 
 (s/def :graphql/schema
-  (s/with-gen
-    (s/coll-of :graphql/schema-definition)
-    #(gen/vector (s/gen :graphql/schema-definition) 1 5)))
+  (s/coll-of :graphql/schema-definition
+             :min-count 1
+             :gen-max 4))
 
 ;; ## Schema Definition
 
@@ -85,19 +84,19 @@
 
 ;; ## Type Definition
 
-(s/def :graphql/type-implements
-  (s/with-gen
-    (s/coll-of :graphql/implements-type)
-    #(gen/vector (s/gen :graphql/implements-type) 0 3)))
+(s/def :graphql/implements
+  (s/coll-of :graphql/implements-type
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/implements-type
   (s/keys :req [:graphql/type-name
                 :graphql/metadata]))
 
 (s/def :graphql/type-fields
-  (s/with-gen
-    (s/coll-of :graphql/type-field)
-    #(gen/vector (s/gen :graphql/type-field) 1 5)))
+  (s/coll-of :graphql/type-field
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/type-field
   (s/keys :req [:graphql/field-name
@@ -106,9 +105,9 @@
           :opt [:graphql/type-field-arguments]))
 
 (s/def :graphql/type-field-arguments
-  (s/with-gen
-    (s/coll-of :graphql/type-field-argument)
-    #(gen/vector (s/gen :graphql/type-field-argument) 1 5)))
+  (s/coll-of :graphql/type-field-argument
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/type-field-argument
   (s/keys :req [:graphql/argument-name
@@ -125,9 +124,9 @@
 ;; ## Input Type Definition
 
 (s/def :graphql/input-type-fields
-  (s/with-gen
-    (s/coll-of :graphql/input-type-field)
-    #(gen/vector (s/gen :graphql/input-type-field) 1 5)))
+  (s/coll-of :graphql/input-type-field
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/input-type-field
   (s/keys :req [:graphql/field-name
@@ -137,9 +136,9 @@
 ;; ## Union Definition
 
 (s/def :graphql/union-types
-  (s/with-gen
-    (s/coll-of :graphql/union-type)
-    #(gen/vector (s/gen :graphql/union-type) 1 5)))
+  (s/coll-of :graphql/union-type
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/union-type
   (s/keys :req [:graphql/type-name
@@ -148,9 +147,9 @@
 ;; ## Enum Definition
 
 (s/def :graphql/enum-fields
-  (s/with-gen
-    (s/coll-of :graphql/enum-field)
-    #(gen/vector (s/gen :graphql/enum-field) 1 5)))
+  (s/coll-of :graphql/enum-field
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/enum-field
   (s/keys :req [:graphql/enum
@@ -160,9 +159,9 @@
 ;; ## Schema Definition
 
 (s/def :graphql/schema-fields
-  (s/with-gen
-    (s/coll-of :graphql/schema-field)
-    #(gen/vector (s/gen :graphql/schema-field) 1 5)))
+  (s/coll-of :graphql/schema-field
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/schema-field
   (s/keys :req [:graphql/operation-type

@@ -1,6 +1,5 @@
 (ns alumbra.spec.document
-  (:require [clojure.spec :as s]
-            [clojure.test.check.generators :as gen]))
+  (:require [clojure.spec :as s]))
 
 ;; ## Name
 
@@ -32,7 +31,8 @@
 ;; ### Operation
 
 (s/def :graphql/operations
-  (s/coll-of :graphql/operation))
+  (s/coll-of :graphql/operation
+             :gen-max 5))
 
 (s/def :graphql/operation
   (s/keys :req [:graphql/selection-set
@@ -51,7 +51,8 @@
 ;; ### Fragments
 
 (s/def :graphql/fragments
-  (s/coll-of :graphql/fragment))
+  (s/coll-of :graphql/fragment
+             :gen-max 5))
 
 (s/def :graphql/fragment
   (s/keys :req [:graphql/fragment-name
@@ -66,9 +67,9 @@
 ;; ### Selection Set
 
 (s/def :graphql/selection-set
-  (s/with-gen
-    (s/coll-of :graphql/selection)
-    #(gen/vector (s/gen :graphql/selection) 1 2)))
+  (s/coll-of :graphql/selection
+             :min-count 1
+             :gen-max 5))
 
 (s/def :graphql/selection
   (s/or :field           :graphql/field
@@ -114,22 +115,18 @@
   string?)
 
 (s/def :graphql/boolean
-  (s/with-gen
-    #(contains? #{true false} %)
-    #(gen/elements [true false])))
+  boolean?)
 
 (s/def :graphql/enum
   :graphql/name)
 
 (s/def :graphql/list
-  (s/with-gen
-    (s/coll-of :graphql/value)
-    #(gen/vector (s/gen :graphql/value) 0 3)))
+  (s/coll-of :graphql/value
+             :gen-max 3))
 
 (s/def :graphql/object-fields
-  (s/with-gen
-    (s/coll-of :graphql/object-field)
-    #(gen/vector (s/gen :graphql/object-field) 1 3)))
+  (s/coll-of :graphql/object-field
+             :gen-max 3))
 
 (s/def :graphql/object-field
   (s/keys :req [:graphql/field-name
@@ -217,9 +214,9 @@
   :graphql/constant)
 
 (s/def :graphql/variables
-  (s/with-gen
-    (s/coll-of :graphql/variable-definition)
-    #(gen/vector (s/gen :graphql/variable) 1 3)))
+  (s/coll-of :graphql/variable-definition
+             :min-count 1
+             :gen-max 3))
 
 ;; ## Types
 
@@ -250,9 +247,9 @@
 ;; ## Arguments
 
 (s/def :graphql/arguments
-  (s/with-gen
-    (s/coll-of :graphql/argument)
-    #(gen/vector (s/gen :graphql/argument) 1 3)))
+  (s/coll-of :graphql/argument
+             :min-count 1
+             :gen-max 3))
 
 (s/def :graphql/argument
   (s/keys :req [:graphql/argument-name
@@ -268,9 +265,9 @@
 ;; ## Directives
 
 (s/def :graphql/directives
-  (s/with-gen
-    (s/coll-of :graphql/directive)
-    #(gen/vector (s/gen :graphql/directive) 1 2)))
+  (s/coll-of :graphql/directive
+             :min-count 1
+             :gen-max 2))
 
 (s/def :graphql/directive
   (s/keys :req [:graphql/directive-name

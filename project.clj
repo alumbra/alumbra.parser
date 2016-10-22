@@ -7,7 +7,7 @@
             :year 2016
             :key "mit"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
-                 [org.clojure/test.check "0.9.0"]
                  [clj-antlr "0.2.3"]]
-  :profiles {:dev {:dependencies [[alumbra/generators "0.1.0"]]}}
+  :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]
+                                  [alumbra/generators "0.1.0"]]}}
   :pedantic? :abort)
