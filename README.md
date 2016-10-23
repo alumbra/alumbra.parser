@@ -11,10 +11,10 @@ An [ANTLR4][antlr]-based [GraphQL][ql] parser for Clojure.
 ## Usage
 
 There are two different parsers – one for GraphQL query documents (as specified
-[here][query-spec]), as well as one for the GraphQL type system definitions. The
-latter does not seem to have a specification yet, so the parser implementation
-is currently based on the official "Schema and Types" guide available
-[here][schema-guide].
+[here][query-spec]), as well as one for GraphQL type system definitions. The
+latter ones do not seem to have a specification yet, so the parser
+implementation is currently based on the official "Schema and Types" guide
+available [here][schema-guide].
 
 ```clojure
 (require '[alumbra.parser :as graphql])
@@ -39,6 +39,9 @@ is currently based on the official "Schema and Types" guide available
 ;;                         :operation-name "People",
 ;;                         ...}]}
 ```
+
+The resulting AST will conform to the spec `:graphql/document` which you can
+find in the namespace `alumbra.spec.document`.
 
 ### Type System
 
