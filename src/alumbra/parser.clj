@@ -38,7 +38,7 @@
    to the `:graphql/document` spec.
 
    ```clojure
-   (parse-schema \"type Person { id: Int!, name: String! }\")
+   (parse-document \"{ id, name }\")
    ;; => #:graphql{:operations
    ;;              [#:graphql{:operation-type \"query\",
    ;;                         :selection-set
@@ -63,7 +63,7 @@
    to the `:graphql/schema` spec.
 
    ```clojure
-   (parse-document \"{ id, name }\")
+   (parse-schema \"type Person { id: Int!, name: String! }\")
    ;; => [#:graphql{:type-name \"Person\",
    ;;               :metadata {:row 0, :column 5, :index 5},
    ;;               :type-fields
