@@ -62,11 +62,15 @@ variableDefinitions
     ;
 
 variableDefinition
-    : variable ':' type defaultValue?
+    : variableName ':' variableType defaultValue?
     ;
 
-variable
+variableName
     : '$' anyName
+    ;
+
+variableType
+    : type
     ;
 
 defaultValue
@@ -100,7 +104,15 @@ arguments
     ;
 
 argument
-    : anyName ':' valueWithVariable
+    : argumentName ':' argumentValue
+    ;
+
+argumentName
+    : anyName
+    ;
+
+argumentValue
+    : valueWithVariable
     ;
 
 fragmentSpread
@@ -129,7 +141,7 @@ value
     | objectValue;
 
 valueWithVariable
-    : variable
+    : variableValue
     | intValue
     | floatValue
     | stringValue
@@ -137,6 +149,10 @@ valueWithVariable
     | enumValue
     | arrayValueWithVariable
     | objectValueWithVariable;
+
+variableValue
+    : variableName
+    ;
 
 intValue
     : IntValue
@@ -175,11 +191,19 @@ objectValueWithVariable
     ;
 
 objectField
-    : anyName ':' value
+    : fieldName ':' objectFieldValue
+    ;
+
+objectFieldValue
+    : value
     ;
 
 objectFieldWithVariable
-    : anyName ':' valueWithVariable
+    : fieldName ':' objectFieldValueWithVariable
+    ;
+
+objectFieldValueWithVariable
+    : valueWithVariable
     ;
 
 directives
@@ -187,13 +211,21 @@ directives
     ;
 
 directive
-    : '@' anyName arguments?
+    : directiveName arguments?
+    ;
+
+directiveName
+    : '@' anyName
     ;
 
 type
-    : typeName
+    : namedType
     | listType
     | nonNullType
+    ;
+
+namedType
+    : typeName
     ;
 
 typeName
@@ -204,7 +236,7 @@ listType
     ;
 
 nonNullType
-    : typeName '!'
+    : namedType '!'
     | listType '!'
     ;
 

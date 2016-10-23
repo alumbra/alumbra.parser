@@ -64,6 +64,10 @@
 (s/def :graphql/fragment-name
   (s/and :graphql/name #(not= % "on")))
 
+(s/def :graphql/type-condition
+  (s/keys :req [:graphql/type-name
+                :graphql/metadata]))
+
 ;; ### Selection Set
 
 (s/def :graphql/selection-set
@@ -124,7 +128,7 @@
   (s/coll-of :graphql/value
              :gen-max 3))
 
-(s/def :graphql/object-fields
+(s/def :graphql/object
   (s/coll-of :graphql/object-field
              :gen-max 3))
 
@@ -180,7 +184,7 @@
 (defmethod graphql-value-data :object
   [_]
   (s/keys :req [:graphql/value-type
-                :graphql/object-fields
+                :graphql/object
                 :graphql/metadata]))
 
 (defmethod graphql-value-data :list
@@ -220,23 +224,31 @@
 
 ;; ## Types
 
+(s/def :graphql/type-class
+  #{:named-type
+    :list-type})
+
+(defmulti ^:private type-class :graphql/type-class)
+
+(defmethod type-class :named-type
+  [_]
+  (s/keys :req [:graphql/type-class
+                :graphql/type-name
+                :graphql/non-null?
+                :graphql/metadata]))
+
+(defmethod type-class :list-type
+  [_]
+  (s/keys :req [:graphql/type-class
+                :graphql/element-type
+                :graphql/non-null?
+                :graphql/metadata]))
+
 (s/def :graphql/type
-  (s/or :type :graphql/named-type
-        :list :graphql/list-type))
+  (s/multi-spec type-class :graphql/type-class))
 
-(s/def :graphql/type-condition
-  (s/keys :req [:graphql/type-name
-                :graphql/metadata]))
-
-(s/def :graphql/list-type
-  (s/keys :req [:graphql/type
-                :graphql/non-null?
-                :graphql/metadata]))
-
-(s/def :graphql/named-type
-  (s/keys :req [:graphql/type-name
-                :graphql/non-null?
-                :graphql/metadata]))
+(s/def :graphql/element-type
+  :graphql/type)
 
 (s/def :graphql/type-name
   :graphql/name)

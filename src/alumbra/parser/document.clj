@@ -1,6 +1,8 @@
 (ns alumbra.parser.document
   (:require [alumbra.parser.antlr :as antlr]
-            [alumbra.spec document]))
+            [alumbra.parser.traverse :as t]
+            [alumbra.spec document]
+            [clojure.spec :as s]))
 
 ;; ## Parser
 
@@ -8,267 +10,140 @@
   "Parse a GraphQL document."
   {:grammar "alumbra/GraphQL.g4"
    :root    "document"
-   :aliases {:valueWithVariable       :value
-             :arrayValueWithVariable  :arrayValue
-             :objectValueWithVariable :objectValue
-             :objectFieldWithVariable :objectField}})
+   :aliases
+   {:valueWithVariable            :value
+    :arrayValueWithVariable       :arrayValue
+    :objectValueWithVariable      :objectValue
+    :objectFieldWithVariable      :objectField
+    :objectFieldValueWithVariable :objectFieldValue}})
 
-;; ## Helper
+;; ## Traverse Helpers
 
-(defn- attach-position
-  [value form]
-  {:pre [(map? value)]}
-  (if-let [{:keys [antlr/row antlr/column antlr/index]}
-           (some-> form meta :antlr/start)]
-    (assoc value
-           :graphql/metadata
-           {:row    row
-            :column column
-            :index  index})
-    value))
+;; ### Defaults
 
-;; ## Traverse AST
+(def ^:private operation-default
+  {:graphql/operation-type "query"})
 
-(defmulti ^:private traverse*
-  (fn [state form]
-    (first form))
-  :default ::none)
+(def ^:private type-default
+  {:graphql/non-null? false})
 
-(defmethod traverse* ::none
-  [state [k]]
-  (throw (Exception. (str k)))
-  (vary-meta state update :ast/unknown conj k))
+;; ### Name Traversal
 
-(defn- traverse-all*
-  [state forms]
-  (reduce traverse* state forms))
+(defn- read-name [[_ n]] n)
+(defn- read-nested-name [[_ [_ n]]] n)
+(defn- read-prefixed-name [[_ _ [_ n]]] n)
 
-;; ### Document
+;; ### Value Traversal
 
-(defmethod traverse* :document
-  [state [_ & definitions :as form]]
-  (attach-position
-    (->> (mapv second definitions)
-         (traverse-all* state))
-    form))
+(defn- traverse-value
+  [value-type]
+  (let [value-key (keyword "graphql" (name value-type))]
+    (fn [traverse-fn state [_ v]]
+        (assoc state
+               :graphql/value-type value-type
+               value-key (traverse-fn {} v)))))
 
-;; ### Operation
+(defn traverse-value-list
+  [value-type]
+  (let [value-key (keyword "graphql" (name value-type))]
+    (fn [traverse-fn state [_ _ & body-and-delimiter]]
+      (let [body (butlast body-and-delimiter)]
+        (assoc state
+               :graphql/value-type value-type
+               value-key (mapv #(traverse-fn {} %) body))))))
 
-(defmethod traverse* :operationDefinition
-  [state [_ & body :as form]]
-  (let [data (-> (traverse-all*
-                   {:graphql/operation-type "query"}
-                   body)
-                 (attach-position form))]
-    (update state :graphql/operations (fnil conj []) data)))
+(defn- parse-value
+  [value-type f]
+  (let [value-key (keyword "graphql" (name value-type))]
+    (fn [traverse-fn state [_ v]]
+      (assoc state
+             :graphql/value-type value-type
+             value-key (f v)))))
 
-(defmethod traverse* :operationType
-  [state [_ t]]
-  (assoc state :graphql/operation-type t))
+;; ### Type Traversal
 
-(defmethod traverse* :operationName
-  [state [_ n]]
-  (assoc state :graphql/operation-name n))
-
-;; ### Fragment
-
-(defmethod traverse* :fragmentDefinition
-  [state [_ _ & body :as form]]
-  (let [data (-> (traverse-all* {} body)
-                 (attach-position form))]
-    (update state :graphql/fragments (fnil conj []) data)))
-
-(defmethod traverse* :typeCondition
-  [state [_ _ [_ [_ n]] :as form]]
-  (assoc state
-         :graphql/type-condition
-         (-> {:graphql/type-name n}
-             (attach-position form))))
-
-;; ### Selection Set
-
-(defmethod traverse* :selectionSet
-  [state [_ _ & selections-plus-paren]]
-  (let [selections (mapv second (butlast selections-plus-paren))
-        data (traverse-all* [] selections)]
-    (assoc state :graphql/selection-set data)))
-
-(defmethod traverse* :field
-  [state [_ & body :as form]]
-  (let [data (-> (traverse-all* {} body)
-                 (attach-position form))]
-    (conj state data)))
-
-(defmethod traverse* :fieldAlias
-  [state [_ [_ a]]]
-  (assoc state :graphql/field-alias a))
-
-(defmethod traverse* :fieldName
-  [state [_ [_ a]]]
-  (assoc state :graphql/field-name a))
-
-(defmethod traverse* :fragmentSpread
-  [state [_ _ & body :as form]]
-  (let [data (-> (traverse-all* {} body)
-                 (attach-position form))]
-    (conj state data)))
-
-(defmethod traverse* :fragmentName
-  [state [_ n]]
-  (assoc state :graphql/fragment-name n))
-
-(defmethod traverse* :inlineFragment
-  [state [_ _ & body :as form]]
-  (let [data (-> (traverse-all* {} body)
-                 (attach-position form))]
-    (conj state data)))
-
-;; ### Directives
-
-(defmethod traverse* :directives
-  [state [_ & directives]]
-  (let [data (traverse-all* [] directives)]
-    (assoc state :graphql/directives data)))
-
-(defmethod traverse* :directive
-  [state [_ _ [_ directive-name] & body :as form]]
-  (let [data (-> (traverse-all* {} body)
-                 (assoc :graphql/directive-name directive-name)
-                 (attach-position form))]
-    (conj state data)))
-
-;; ### Arguments
-
-(defmethod traverse* :arguments
-  [state [_ _ & arguments-plus-paren]]
-  (let [arguments (butlast arguments-plus-paren)
-        data (traverse-all* [] arguments)]
-    (assoc state :graphql/arguments data)))
-
-(defmethod traverse* :argument
-  [state [_ [_ argument-name] _ argumentValue :as form]]
-  (conj state
-        (-> {:graphql/argument-name argument-name
-             :graphql/argument-value (traverse* {} argumentValue)}
-            (attach-position form))))
-
-;; ### Values
-
-(defmethod traverse* :value
-  [state [_ v :as form]]
-  (-> (if (= (first v) :variable)
-        (traverse* state [:variableValue v])
-        (traverse* state v))
-      (attach-position form)))
-
-(defmethod traverse* :variableValue
-  [state [_ v]]
-  (assoc state
-         :graphql/value-type :variable
-         :graphql/variable (traverse* {} v)))
-
-(defmethod traverse* :intValue
-  [state [_ v]]
-  (assoc state
-          :graphql/value-type :integer
-          :graphql/integer    (Long. v)))
-
-(defmethod traverse* :floatValue
-  [state [_ v]]
-  (assoc state
-         :graphql/value-type :float
-         :graphql/float      (Double. v)))
-
-(defmethod traverse* :stringValue
-  [state [_ v]]
-  (assoc state
-         :graphql/value-type :string
-         :graphql/string     v))
-
-(defmethod traverse* :booleanValue
-  [state [_ v]]
-  (assoc state
-         :graphql/value-type :boolean
-         :graphql/boolean    (= v "true")))
-
-(defmethod traverse* :enumValue
-  [state [_ [_ n] :as form]]
-  (assoc state
-         :graphql/value-type :enum
-         :graphql/enum n))
-
-(defmethod traverse* :arrayValue
-  [state [_ _ & values-plus-paren]]
-  (let [values (butlast values-plus-paren)]
+(defn- traverse-named-type
+  []
+  (fn [traverse-fn state [_ [_ [_ n]]]]
     (assoc state
-           :graphql/value-type :list
-           :graphql/list       (mapv #(traverse* {} %) values))))
+           :graphql/type-class   :named-type
+           :graphql/type-name    n
+           :graphql/non-null?    false)))
 
-(defmethod traverse* :objectValue
-  [state [_ _ & fields-plus-paren]]
-  (let [fields (butlast fields-plus-paren)]
+(defn- traverse-list-type
+  []
+  (fn [traverse-fn state [_ _ element-type]]
     (assoc state
-          :graphql/value-type    :object
-          :graphql/object-fields (mapv #(traverse* {} %) fields))))
+           :graphql/type-class   :list-type
+           :graphql/non-null?    false
+           :graphql/element-type (traverse-fn {} element-type))))
 
-(defmethod traverse* :objectField
-  [state [_ [_ field-name] _ field-value :as form]]
-  (-> state
-      (assoc :graphql/field-name field-name
-             :graphql/value      (traverse* {} field-value))
-      (attach-position form)))
+(defn- traverse-non-null-type
+  []
+  (fn [traverse-fn state [_ inner-type]]
+    (-> (traverse-fn state inner-type)
+        (assoc :graphql/non-null? true))))
 
-;; ## Variable
+;; ## Transformation
 
-(defmethod traverse* :variable
-  [state [_ _ [_ n] :as form]]
-  (-> state
-      (assoc :graphql/variable-name n)
-      (attach-position form)))
+(def ^:private traverse
+  (t/traverser
+    {:document            (t/traverse-body)
+     :definition          (t/unwrap)
+     :operationDefinition (t/body-as :graphql/operations operation-default)
+     :operationType       (t/as :graphql/operation-type read-name)
+     :operationName       (t/as :graphql/operation-name read-name)
 
-(defmethod traverse* :variableDefinitions
-  [state [_ _ & definitions-plus-paren]]
-  (let [definitions (butlast definitions-plus-paren)
-        data (traverse-all* [] definitions)]
-    (assoc state :graphql/variables data)))
+     :selectionSet        (t/block-as :graphql/selection-set)
+     :selection           (t/unwrap)
+     :field               (t/traverse-body)
+     :fieldName           (t/as :graphql/field-name read-nested-name)
+     :fieldAlias          (t/as :graphql/field-alias read-nested-name)
+     :fragmentSpread      (t/traverse-body)
+     :inlineFragment      (t/traverse-body)
 
-(defmethod traverse* :variableDefinition
-  [state [_ variable _ & body]]
-  (conj state
-        (-> {}
-            (traverse* variable)
-            (traverse-all* body))))
+     :fragmentDefinition  (t/body-as :graphql/fragments)
+     :fragmentName        (t/as :graphql/fragment-name read-name)
+     :typeCondition       (t/unwrap-last-as :graphql/type-condition)
 
-(defmethod traverse* :defaultValue
-  [state [_ _ value]]
-  (assoc state :graphql/default-value (traverse* {} value)))
+     :directives          (t/body-as :graphql/directives)
+     :directive           (t/traverse-body)
+     :directiveName       (t/as :graphql/directive-name read-prefixed-name)
 
-;; ## Types
+     :arguments           (t/block-as :graphql/arguments)
+     :argument            (t/traverse-body)
+     :argumentName        (t/as :graphql/argument-name read-nested-name)
+     :argumentValue       (t/unwrap-as :graphql/argument-value)
 
-(defmethod traverse* :type
-  [state [_ t :as form]]
-  (assoc state
-         :graphql/type
-         (-> {:graphql/non-null? false}
-             (traverse* t)
-             (attach-position form))))
+     :variableDefinitions (t/block-as :graphql/variables)
+     :variableDefinition  (t/traverse-body)
+     :variableName        (t/as :graphql/variable-name read-prefixed-name)
+     :variableType        (t/unwrap-as :graphql/type)
+     :defaultValue        (t/unwrap-last-as :graphql/default-value)
 
-(defmethod traverse* :typeName
-  [state [_ [_ n]]]
-  (assoc state :graphql/type-name n))
+     :value               (t/unwrap)
+     :variableValue       (traverse-value :variable)
+     :arrayValue          (traverse-value-list :list)
+     :objectValue         (traverse-value-list :object)
+     :objectField         (t/traverse-body)
+     :objectFieldValue    (t/unwrap-as :graphql/value)
+     :enumValue           (parse-value :enum read-name)
+     :intValue            (parse-value :integer #(Long. %))
+     :floatValue          (parse-value :float #(Double. %))
+     :stringValue         (parse-value :string str)
+     :booleanValue        (parse-value :boolean #(= % "true"))
 
-(defmethod traverse* :listType
-  [state [_ _ t]]
-  (traverse* state t))
-
-(defmethod traverse* :nonNullType
-  [state [_ t]]
-  (-> state
-      (traverse* t)
-      (assoc :graphql/non-null? true)))
-
-;; ## Transform
+     :type                (t/unwrap)
+     :namedType           (traverse-named-type)
+     :nonNullType         (traverse-non-null-type)
+     :listType            (traverse-list-type)
+     :typeName            (t/as :graphql/type-name read-nested-name)}))
 
 (defn transform
+  "Transform the AST produced by [[parse]] to conform to `:graphql/document`."
   [ast]
-  (traverse* {} ast))
+  (traverse ast))
+
+(s/fdef transform
+        :args (s/cat :ast sequential?)
+        :ret  :graphql/document)
