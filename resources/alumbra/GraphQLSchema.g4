@@ -51,11 +51,11 @@ definition
 // --------------- OUTPUT TYPE ---------------
 
 typeDefinition
-    : 'type' typeName typeImplements? '{' typeField+ '}'
+    : K_TYPE typeName typeImplements? '{' typeField+ '}'
     ;
 
 typeImplements
-    : 'implements' typeName+
+    : K_IMPLEMENTS typeName+
     ;
 
 typeField
@@ -81,13 +81,13 @@ defaultValue
 // --------------- INTERFACE ---------------
 
 interfaceDefinition
-    : 'interface' typeName '{' typeField+ '}'
+    : K_INTERFACE typeName '{' typeField+ '}'
     ;
 
 // --------------- SCHEMA ---------------
 
 schemaDefinition
-    : 'schema' '{' schemaType+ '}'
+    : K_SCHEMA '{' schemaType+ '}'
     ;
 
 schemaType
@@ -97,7 +97,7 @@ schemaType
 // --------------- ENUM ---------------
 
 enumDefinition
-    : 'enum' typeName '{' enumField+ '}'
+    : K_ENUM typeName '{' enumField+ '}'
     ;
 
 enumField
@@ -105,13 +105,13 @@ enumField
     ;
 
 enumType
-    : '@enum' 'Int' '(' 'value' ':' intValue ')'
+    : '@' K_ENUM K_ENUM_INT  '(' 'value' ':' intValue ')'
     ;
 
 // --------------- UNION ---------------
 
 unionDefinition
-    : 'union' typeName '=' unionTypeNames
+    : K_UNION typeName '=' unionTypeNames
     ;
 
 unionTypeNames
@@ -121,7 +121,7 @@ unionTypeNames
 // --------------- INPUT TYPE ---------------
 
 inputTypeDefinition
-    : 'input' typeName '{' inputTypeField+ '}'
+    : K_INPUT typeName '{' inputTypeField+ '}'
     ;
 
 inputTypeField
@@ -131,7 +131,7 @@ inputTypeField
 // --------------- DIRECTIVES ---------------
 
 directiveDefinition
-    : 'directive' directiveName typeCondition
+    : K_DIRECTIVE directiveName typeCondition
     ;
 
 directiveName
@@ -141,13 +141,13 @@ directiveName
 // --------------- EXTEND TYPE ---------------
 
 typeExtensionDefinition
-    : 'extend' typeDefinition
+    : K_EXTEND typeDefinition
     ;
 
 // --------------- SCALAR ---------------
 
 scalarDefinition
-    : 'scalar' typeName
+    : K_SCALAR typeName
     ;
 
 // --------------- TYPES ---------------
@@ -172,7 +172,7 @@ nonNullType
     ;
 
 typeCondition
-    : 'on' typeName
+    : K_ON typeName
     ;
 
 // --------------- VALUES ---------------
@@ -216,6 +216,16 @@ BooleanValue
 anyName
     : NAME
     | K_TYPE
+    | K_IMPLEMENTS
+    | K_INTERFACE
+    | K_SCHEMA
+    | K_ENUM
+    | K_ENUM_INT
+    | K_UNION
+    | K_INPUT
+    | K_DIRECTIVE
+    | K_EXTEND
+    | K_SCALAR
     | K_ON
     | K_FRAGMENT
     | K_QUERY
@@ -226,6 +236,16 @@ anyName
 fragmentName
     : NAME
     | K_TYPE
+    | K_IMPLEMENTS
+    | K_INTERFACE
+    | K_SCHEMA
+    | K_ENUM
+    | K_ENUM_INT
+    | K_UNION
+    | K_INPUT
+    | K_DIRECTIVE
+    | K_EXTEND
+    | K_SCALAR
     | K_FRAGMENT
     | K_QUERY
     | K_MUTATION
@@ -233,6 +253,16 @@ fragmentName
     ;
 
 K_TYPE : 'type' ;
+K_IMPLEMENTS : 'implements' ;
+K_INTERFACE : 'interface' ;
+K_SCHEMA : 'schema' ;
+K_ENUM : 'enum' ;
+K_ENUM_INT : 'Int' ;
+K_UNION : 'union' ;
+K_INPUT : 'input' ;
+K_DIRECTIVE : 'directive' ;
+K_EXTEND : 'extend' ;
+K_SCALAR : 'scalar' ;
 K_ON : 'on' ;
 K_FRAGMENT : 'fragment' ;
 K_QUERY : 'query' ;
