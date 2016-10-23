@@ -10,9 +10,43 @@ An [ANTLR4][antlr]-based [GraphQL][ql] parser for Clojure.
 
 ## Usage
 
-TODO
+There are two different parsers – one for GraphQL query documents (as specified
+[here][query-spec]), as well as one for the GraphQL type system definitions. The
+latter does not seem to have a specification yet, so the parser implementation
+is currently based on the official "Schema and Types" guide available
+[here][schema-guide].
 
-## Tests
+```clojure
+(require '[alumbra.parser :as graphql])
+```
+
+[query-spec]: https://facebook.github.io/graphql/#sec-Appendix-Grammar-Summary
+[schema-guide]: http://graphql.org/learn/schema/
+
+### Query Documents
+
+```clojure
+(graphql/parse-document
+  "query People($limit: Int = 10, $offset: Int = 0) {
+     people(limit: $limit, offset: $offset) {
+       name
+       friends { name }
+     }
+   }")
+;; => #:graphql{:operations
+;;              [#:graphql{:operation-type "query",
+;;                         :metadata {:row 0, :column 0, :index 0},
+;;                         :operation-name "People",
+;;                         ...}]}
+```
+
+### Type System
+
+```clojure
+;; TODO
+```
+
+### Tests
 
 This project uses [alumbra.generators][gens] and [test.check][tc] to verify
 parser functionality. You can run all tests using:
