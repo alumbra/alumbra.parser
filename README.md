@@ -1,6 +1,6 @@
 # alumbra.parser
 
-An [ANTLR4][antlr]-based [GraphQL] parser for Clojure.
+An [ANTLR4][antlr]-based [GraphQL][ql] parser for Clojure.
 
 [![Build Status](https://travis-ci.org/alumbra/alumbra.parser.svg?branch=master)](https://travis-ci.org/alumbra/alumbra.parser)
 [![Clojars Project](https://img.shields.io/clojars/v/alumbra/parser.svg)](https://clojars.org/alumbra/parser)
