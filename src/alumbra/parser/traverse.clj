@@ -5,14 +5,16 @@
 (defn- attach-position
   [value form]
   {:pre [(map? value)]}
-  (if-let [{:keys [antlr/row antlr/column antlr/index]}
-           (some-> form meta :antlr/start)]
-    (assoc value
-           :graphql/metadata
-           {:row    row
-            :column column
-            :index  index})
-    value))
+  (if (contains? value :graphql/metadata)
+    value
+    (if-let [{:keys [antlr/row antlr/column antlr/index]}
+             (some-> form meta :antlr/start)]
+      (assoc value
+             :graphql/metadata
+             {:row    row
+              :column column
+              :index  index})
+      value)))
 
 ;; ## Traversal
 
