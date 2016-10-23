@@ -9,5 +9,13 @@
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
                  [clj-antlr "0.2.3"]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]
-                                  [alumbra/generators "0.1.0"]]}}
+                                  [alumbra/generators "0.1.0"]]}
+             :codox {:plugins [[lein-codox "0.10.0"]]
+                     :dependencies [[codox-theme-rdash "0.1.1"]]
+                     :codox {:project {:name "alumbra.parser"}
+                             :metadata {:doc/format :markdown}
+                             :themes [:rdash]
+                             :source-uri "https://github.com/alumbra/alumbra.parser/blob/v{version}/{filepath}#L{line}"
+                             :namespaces [alumbra.parser]}}}
+  :aliases {"codox" ["with-profile" "+codox" "codox"]}
   :pedantic? :abort)

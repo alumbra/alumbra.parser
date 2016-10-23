@@ -143,7 +143,7 @@
   #{:variable :integer :float :string
     :boolean :enum :object :list})
 
-(defmulti graphql-value-data :graphql/value-type)
+(defmulti ^:private graphql-value-data :graphql/value-type)
 
 (defmethod graphql-value-data :variable
   [_]

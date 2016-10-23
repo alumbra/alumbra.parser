@@ -36,6 +36,19 @@
   "Parse a GraphQL document and return its in-memory representation, conforming
    to the `:graphql/document` spec.
 
+   ```clojure
+   (parse-document \"{ id, name }\")
+   ;; => #:graphql{:operations
+   ;;              [#:graphql{:operation-type \"query\",
+   ;;                         :selection-set
+   ;;                         [#:graphql{:field-name \"id\",
+   ;;                                    :metadata {:row 0, :column 2, :index 2}}
+   ;;                          #:graphql{:field-name \"name\",
+   ;;                                    :metadata {:row 0, :column 6, :index 6}}],
+   ;;                         :metadata {:row 0, :column 0, :index 0}}],
+   ;;              :metadata {:row 0, :column 0, :index 0}}
+   ```
+
    If the parser fails, an error container is returned that can be checked for
    using [[error?]]."
   [document]

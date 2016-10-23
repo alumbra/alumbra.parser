@@ -15,7 +15,7 @@
   #{:type :interface :schema :enum :union
     :input :directive :scalar :extend-type})
 
-(defmulti definition-type :graphql/definition-type)
+(defmulti ^:private definition-type :graphql/definition-type)
 
 (defmethod definition-type :type
   [_]
