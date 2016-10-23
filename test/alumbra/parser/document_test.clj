@@ -37,3 +37,33 @@
                    m)))
              (filter map?)
              (every? :graphql/metadata))))))
+
+(defspec t-transform-collects-all-definitions 50
+  (prop/for-all
+    [document g/-document]
+    (let [ast (document/parse document)]
+      (when-not (antlr/error? ast)
+        (let [result (document/transform ast)]
+          (= (count (next ast))
+             (+ (count (:graphql/operations result))
+                (count (:graphql/fragments result)))))))))
+
+(defspec t-transform-collects-all-operation-variables 50
+  (prop/for-all
+    [document g/-document]
+    (let [ast (document/parse document)]
+      (when-not (antlr/error? ast)
+        (let [expected-variable-counts
+              (for [[_ [k & rst]] (next ast)
+                    :when (= k :operationDefinition)]
+                (or (->> rst
+                     (some
+                       (fn [[k & body]]
+                         (when (= k :variableDefinitions)
+                           (- (count body) 2)))))
+                    0))
+              variable-counts
+              (->> (document/transform ast)
+                   (:graphql/operations)
+                   (map (comp count :graphql/variables)))]
+          (= expected-variable-counts variable-counts))))))
