@@ -25,6 +25,8 @@ available [here][schema-guide].
 
 ### Query Documents
 
+__[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#var-parse-document)__
+
 ```clojure
 (graphql/parse-document
   "query People($limit: Int = 10, $offset: Int = 0) {
@@ -44,6 +46,8 @@ The resulting AST will conform to the spec `:graphql/document` which you can
 find in the namespace `alumbra.spec.document`.
 
 ### Type System
+
+__[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#var-parse-schema)__
 
 ```clojure
 ;; TODO
