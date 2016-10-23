@@ -90,7 +90,7 @@
   (t/traverser
     {:document            (t/traverse-body)
      :definition          (t/unwrap)
-     :operationDefinition (t/body-as :graphql/operations operation-default)
+     :operationDefinition (t/collect-as :graphql/operations operation-default)
      :operationType       (t/as :graphql/operation-type read-name)
      :operationName       (t/as :graphql/operation-name read-name)
 
@@ -102,7 +102,7 @@
      :fragmentSpread      (t/traverse-body)
      :inlineFragment      (t/traverse-body)
 
-     :fragmentDefinition  (t/body-as :graphql/fragments)
+     :fragmentDefinition  (t/collect-as :graphql/fragments)
      :fragmentName        (t/as :graphql/fragment-name read-name)
      :typeCondition       (t/unwrap-last-as :graphql/type-condition)
 

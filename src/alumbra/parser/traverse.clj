@@ -53,19 +53,26 @@
     (fn [traverse-fn state [_ & body]]
       (reduce traverse-fn state body))))
 
-(defn body-as
+(defn collect-as
   [k & [initial-state]]
   (let [initial-state (or initial-state {})]
     (fn [traverse-fn state [_ & body]]
       (let [result (reduce traverse-fn initial-state body)]
         (update state k (fnil conj []) result)))))
 
+(defn body-as
+  [k & [initial-state]]
+  (let [initial-state (or initial-state {})]
+    (fn [traverse-fn state [_ & body]]
+      (let [result (mapv #(traverse-fn initial-state %) body)]
+        (assoc state k result)))))
+
 (defn block-as
   [k & [initial-state]]
   (fn [traverse-fn state [_ _ & body-and-delimiter]]
     (let [body (butlast body-and-delimiter)
-          result (reduce traverse-fn initial-state body)]
-      (update state k (fnil conj []) result))))
+          result (mapv #(traverse-fn initial-state %) body)]
+      (assoc state k result))))
 
 (defn as
   [k & [preprocess]]
