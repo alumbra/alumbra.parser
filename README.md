@@ -42,16 +42,31 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
 ;;                         ...}]}
 ```
 
-The resulting AST will conform to the spec `:graphql/document` which you can
-find in the namespace `alumbra.spec.document`.
+The resulting AST will conform to the spec `:graphql/document` which can be
+found in the namespace `alumbra.spec.document`.
 
 ### Type System
 
 __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#var-parse-schema)__
 
 ```clojure
-;; TODO
+(graphql/parse-schema
+  "type Person {
+     name: String!
+   }
+
+   type QueryRoot {
+     people(limit: Int, offset: Int): [Person]
+   }")
+;; => [#:graphql{:type-name "Person",
+;;               :metadata {:row 0, :column 5, :index 5},
+;;               :type-fields [#:graphql{:field-name "name",
+;;                                       :metadata {:row 1, :column 6, :index 20},
+;;                                       ...}]}]
 ```
+
+The resulting AST will conform to the spec `:graphql/schema` which can be
+found in the namespace `alumbra.spec.schema`.
 
 ### Tests
 

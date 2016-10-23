@@ -111,9 +111,12 @@
 
 (s/def :graphql/type-field-argument
   (s/keys :req [:graphql/argument-name
-                :graphql/type
+                :graphql/argument-type
                 :graphql/metadata]
           :opt [:graphql/argument-default-value]))
+
+(s/def :graphql/argument-type
+  :graphql/type)
 
 (s/def :graphql/argument-default-value
   (s/and :graphql/constant

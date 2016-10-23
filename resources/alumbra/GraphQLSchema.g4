@@ -51,15 +51,23 @@ definition
 // --------------- OUTPUT TYPE ---------------
 
 typeDefinition
-    : K_TYPE typeName typeImplements? '{' typeField+ '}'
+    : K_TYPE typeName typeImplements? typeDefinitionFields
+    ;
+
+typeDefinitionFields
+    : '{' typeDefinitionField+ '}'
     ;
 
 typeImplements
     : K_IMPLEMENTS typeName+
     ;
 
-typeField
-    : fieldName arguments? ':' type
+typeDefinitionField
+    : fieldName arguments? ':' typeDefinitionFieldType
+    ;
+
+typeDefinitionFieldType
+    : type
     ;
 
 fieldName
@@ -71,7 +79,15 @@ arguments
     ;
 
 argument
-    : anyName ':' type defaultValue?
+    : argumentName ':' argumentType defaultValue?
+    ;
+
+argumentName
+    : anyName
+    ;
+
+argumentType
+    : type
     ;
 
 defaultValue
@@ -81,7 +97,7 @@ defaultValue
 // --------------- INTERFACE ---------------
 
 interfaceDefinition
-    : K_INTERFACE typeName '{' typeField+ '}'
+    : K_INTERFACE typeName typeDefinitionFields
     ;
 
 // --------------- SCHEMA ---------------
@@ -153,21 +169,24 @@ scalarDefinition
 // --------------- TYPES ---------------
 
 type
-    : typeName
+    : namedType
     | listType
     | nonNullType
     ;
 
-typeName
-    : anyName
+namedType
+    : typeName
     ;
+
+typeName
+    : anyName;
 
 listType
     : '[' type ']'
     ;
 
 nonNullType
-    : typeName '!'
+    : namedType '!'
     | listType '!'
     ;
 
