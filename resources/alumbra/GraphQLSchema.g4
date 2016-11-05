@@ -59,7 +59,11 @@ typeDefinitionFields
     ;
 
 typeImplements
-    : K_IMPLEMENTS typeName+
+    : K_IMPLEMENTS typeImplementsTypes
+    ;
+
+typeImplementsTypes
+    : typeName+
     ;
 
 typeDefinitionField
@@ -103,7 +107,11 @@ interfaceDefinition
 // --------------- SCHEMA ---------------
 
 schemaDefinition
-    : K_SCHEMA '{' schemaType+ '}'
+    : K_SCHEMA '{' schemaTypes '}'
+    ;
+
+schemaTypes
+    : schemaType+
     ;
 
 schemaType
@@ -113,35 +121,55 @@ schemaType
 // --------------- ENUM ---------------
 
 enumDefinition
-    : K_ENUM typeName '{' enumField+ '}'
+    : K_ENUM typeName enumDefinitionFields
     ;
 
-enumField
-    : enumValue enumType?
+enumDefinitionFields
+    : '{' enumDefinitionField+ '}'
     ;
 
-enumType
-    : '@' K_ENUM K_ENUM_INT  '(' 'value' ':' intValue ')'
+enumDefinitionField
+    : enumDefinitionFieldName enumDefinitionType?
+    ;
+
+enumDefinitionFieldName
+    : anyName
+    ;
+
+enumDefinitionType
+    : '@' K_ENUM K_ENUM_INT  '(' 'value' ':' enumDefinitionIntValue ')'
+    ;
+
+enumDefinitionIntValue
+    : intValue
     ;
 
 // --------------- UNION ---------------
 
 unionDefinition
-    : K_UNION typeName '=' unionTypeNames
+    : K_UNION typeName '=' unionDefinitionTypes
     ;
 
-unionTypeNames
+unionDefinitionTypes
     : typeName ( '|' typeName )*
     ;
 
 // --------------- INPUT TYPE ---------------
 
 inputTypeDefinition
-    : K_INPUT typeName '{' inputTypeField+ '}'
+    : K_INPUT typeName inputTypeDefinitionFields
     ;
 
-inputTypeField
-    : fieldName ':' type
+inputTypeDefinitionFields
+    : '{' inputTypeDefinitionField+ '}'
+    ;
+
+inputTypeDefinitionField
+    : fieldName ':' inputTypeDefinitionFieldType
+    ;
+
+inputTypeDefinitionFieldType
+    : type
     ;
 
 // --------------- DIRECTIVES ---------------

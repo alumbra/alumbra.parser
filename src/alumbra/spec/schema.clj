@@ -23,7 +23,7 @@
                 :graphql/type-name
                 :graphql/type-fields
                 :graphql/metadata]
-          :opt [:graphql/type-implements]))
+          :opt [:graphql/interface-types]))
 
 (defmethod definition-type :extend-type
   [_]
@@ -31,7 +31,7 @@
                 :graphql/type-name
                 :graphql/type-fields
                 :graphql/metadata]
-          :opt [:graphql/type-implements]))
+          :opt [:graphql/interface-types]))
 
 (defmethod definition-type :interface
   [_]
@@ -84,12 +84,12 @@
 
 ;; ## Type Definition
 
-(s/def :graphql/implements
-  (s/coll-of :graphql/implements-type
+(s/def :graphql/interface-types
+  (s/coll-of :graphql/interface-type
              :min-count 1
              :gen-max 3))
 
-(s/def :graphql/implements-type
+(s/def :graphql/interface-type
   (s/keys :req [:graphql/type-name
                 :graphql/metadata]))
 

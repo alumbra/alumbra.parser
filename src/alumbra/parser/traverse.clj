@@ -66,14 +66,16 @@
   [k & [initial-state]]
   (let [initial-state (or initial-state {})]
     (fn [traverse-fn state [_ & body]]
-      (let [result (mapv #(traverse-fn initial-state %) body)]
+      (let [result (mapv #(traverse-fn initial-state %)
+                         (remove string? body))]
         (assoc state k result)))))
 
 (defn block-as
   [k & [initial-state]]
   (fn [traverse-fn state [_ _ & body-and-delimiter]]
     (let [body (butlast body-and-delimiter)
-          result (mapv #(traverse-fn initial-state %) body)]
+          result (mapv #(traverse-fn initial-state %)
+                       (remove string? body))]
       (assoc state k result))))
 
 (defn as

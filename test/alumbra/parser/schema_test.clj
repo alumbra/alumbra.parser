@@ -14,3 +14,11 @@
     [schema g/-schema]
     (let [ast (schema/parse schema)]
       (not (antlr/error? ast)))))
+
+(defspec t-transform-conforms-to-spec 500
+  (prop/for-all
+    [schema g/-schema]
+    (let [ast (schema/parse schema)]
+      (when-not (antlr/error? ast)
+        (->> (schema/transform ast)
+             (s/valid? :graphql/schema))))))
