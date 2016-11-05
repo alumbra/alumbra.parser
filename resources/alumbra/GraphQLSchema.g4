@@ -185,7 +185,7 @@ directiveName
 // --------------- EXTEND TYPE ---------------
 
 typeExtensionDefinition
-    : K_EXTEND typeDefinition
+    : K_EXTEND K_TYPE typeName typeImplements? typeDefinitionFields
     ;
 
 // --------------- SCALAR ---------------

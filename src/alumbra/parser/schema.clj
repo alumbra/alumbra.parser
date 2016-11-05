@@ -32,14 +32,6 @@
 
 (defn- read-nested-integer [[_ [_ v]]] (Long. v))
 
-;; ### Definition Traversal
-
-(defn- traverse-definition
-  [definition-type]
-  (fn [traverse-fn state [_ & body]]
-    (-> (reduce traverse-fn state body)
-        (assoc :graphql/definition-type definition-type))))
-
 ;; ### Type Definition Traversal
 
 (defn- traverse-named-type
@@ -78,9 +70,9 @@
 (def ^:private traverse
   (t/traverser
     {:schema                       (t/traverse-body)
-     :definition                   (t/collect-as ::definitions)
+     :definition                   (t/unwrap)
 
-     :typeDefinition               (traverse-definition :type)
+     :typeDefinition               (t/collect-as :graphql/type-definitions)
      :typeImplements               (t/traverse-body)
      :typeImplementsTypes          (t/body-as :graphql/interface-types)
      :typeDefinitionFields         (t/block-as :graphql/type-fields)
@@ -88,11 +80,11 @@
      :typeDefinitionFieldType      (t/unwrap-as :graphql/type)
      :fieldName                    (t/as :graphql/field-name read-nested-name)
 
-     :typeExtensionDefinition      (traverse-definition :extend-type)
-     :interfaceDefinition          (traverse-definition :interface)
-     :scalarDefinition             (traverse-definition :scalar)
+     :typeExtensionDefinition      (t/collect-as :graphql/type-extensions)
+     :interfaceDefinition          (t/collect-as :graphql/interface-definitions)
+     :scalarDefinition             (t/collect-as :graphql/scalar-definitions)
 
-     :inputTypeDefinition          (traverse-definition :input)
+     :inputTypeDefinition          (t/collect-as :graphql/input-type-definitions)
      :inputTypeDefinitionFields    (t/block-as :graphql/input-type-fields)
      :inputTypeDefinitionField     (t/traverse-body)
      :inputTypeDefinitionFieldType (t/unwrap-as :graphql/type)
@@ -103,17 +95,17 @@
      :argumentType                 (t/unwrap-as :graphql/argument-type)
      :defaultValue                 (t/unwrap-last-as :graphql/default-value)
 
-     :schemaDefinition             (traverse-definition :schema)
+     :schemaDefinition             (t/collect-as :graphql/schema-definitions)
      :schemaTypes                  (t/body-as :graphql/schema-fields)
      :schemaType                   (traverse-schema-type)
 
-     :directiveDefinition          (traverse-definition :directive)
+     :directiveDefinition          (t/collect-as :graphql/directive-definitions)
      :directiveName                (t/as :graphql/directive-name read-prefixed-name)
 
-     :unionDefinition              (traverse-definition :union)
+     :unionDefinition              (t/collect-as :graphql/union-definitions)
      :unionDefinitionTypes         (t/body-as :graphql/union-types)
 
-     :enumDefinition               (traverse-definition :enum)
+     :enumDefinition               (t/collect-as :graphql/enum-definitions)
      :enumDefinitionFields         (t/block-as :graphql/enum-fields)
      :enumDefinitionField          (t/traverse-body)
      :enumDefinitionFieldName      (t/as :graphql/enum read-nested-name)
@@ -137,7 +129,7 @@
 (defn transform
   "Transform the AST produced by [[parse]] to conform to `:graphql/schema`."
   [ast]
-  (::definitions (traverse ast)))
+  (traverse ast))
 
 (s/fdef transform
         :args (s/cat :ast sequential?)
