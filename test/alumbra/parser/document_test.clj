@@ -7,7 +7,8 @@
             [alumbra.generators.document :as g]
             [alumbra.parser
              [antlr :as antlr]
-             [document :as document]]))
+             [document :as document]
+             spec]))
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all

@@ -1,8 +1,6 @@
 (ns alumbra.parser.schema
   (:require [alumbra.parser.antlr :as antlr]
-            [alumbra.parser.traverse :as t]
-            [alumbra.spec schema]
-            [clojure.spec :as s]))
+            [alumbra.parser.traverse :as t]))
 
 ;; ## Parser
 
@@ -130,7 +128,3 @@
   "Transform the AST produced by [[parse]] to conform to `:graphql/schema`."
   [ast]
   (traverse ast))
-
-(s/fdef transform
-        :args (s/cat :ast sequential?)
-        :ret  :graphql/schema)

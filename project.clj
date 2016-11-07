@@ -6,7 +6,8 @@
             :author "Yannick Scherer"
             :year 2016
             :key "mit"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
+                 [alumbra/spec "0.1.0-SNAPSHOT"]
                  [clj-antlr "0.2.3"]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]
                                   [alumbra/generators "0.1.0"]]}

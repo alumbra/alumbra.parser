@@ -3,9 +3,7 @@
   (:require [alumbra.parser
              [antlr :as antlr]
              [document :as document]
-             [schema :as schema]]
-            [alumbra.spec document]
-            [clojure.spec :as s]))
+             [schema :as schema]]))
 
 ;; ## Public API
 
@@ -89,15 +87,3 @@
     (if-not (error? result)
       (schema/transform result)
       result)))
-
-;; ## Specs
-
-(s/fdef parse-document
-        :args (s/alt :string string?)
-        :ret (s/alt :document :graphql/document
-                    :error     error?))
-
-(s/fdef parse-schema
-        :args (s/alt :string string?)
-        :ret (s/alt :document :graphql/schema
-                    :error     error?))
