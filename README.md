@@ -20,8 +20,12 @@ available [here][schema-guide].
 (require '[alumbra.parser :as graphql])
 ```
 
+The data produced by both parsers conforms to the specs given in
+[alumbra.spec][alumbra-spec].
+
 [query-spec]: https://facebook.github.io/graphql/#sec-Appendix-Grammar-Summary
 [schema-guide]: http://graphql.org/learn/schema/
+[alumbra-spec]: https://github.com/alumbra/alumbra.spec
 
 ### Query Documents
 
@@ -42,8 +46,7 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
 ;;                         ...}]}
 ```
 
-The resulting AST will conform to the spec `:graphql/document` which can be
-found in the namespace `alumbra.spec.document`.
+The resulting AST will conform to the spec `:graphql/document`.
 
 ### Type System
 
@@ -65,8 +68,7 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
 ;;                                       ...}]}]
 ```
 
-The resulting AST will conform to the spec `:graphql/schema` which can be
-found in the namespace `alumbra.spec.schema`.
+The resulting AST will conform to the spec `:graphql/schema`.
 
 ### Tests
 
