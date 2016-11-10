@@ -3,14 +3,14 @@
 ;; ## Metadata
 
 (defn- attach-position
-  [value metadata-key form]
+  [value form]
   {:pre [(map? value)]}
-  (if (contains? value metadata-key)
+  (if (contains? value :alumbra/metadata)
     value
     (if-let [{:keys [antlr/row antlr/column antlr/index]}
              (some-> form meta :antlr/start)]
       (assoc value
-             metadata-key
+             :alumbra/metadata
              {:row    row
               :column column
               :index  index})
@@ -19,13 +19,13 @@
 ;; ## Traversal
 
 (defn- traverse*
-  [visitors metadata-key state form]
+  [visitors state form]
   (if (string? form)
     state
     (let [k (first form)]
       (if-let [visitor (get visitors k)]
-        (-> (visitor #(traverse* visitors metadata-key %1 %2) state form)
-            (attach-position metadata-key form))
+        (-> (visitor #(traverse* visitors %1 %2) state form)
+            (attach-position form))
         (throw
           (IllegalStateException.
             (format "no visitor defined for node type '%s' in: %s"
@@ -38,12 +38,12 @@
    current form.
 
    The result of each visitor should be a map."
-  [visitors metadata-key]
+  [visitors]
   (let [visitors (->> (for [[ks visitor] visitors
                             k (if (sequential? ks) ks [ks])]
                         [k visitor])
                       (into {}))]
-    #(traverse* visitors metadata-key {} %)))
+    #(traverse* visitors {} %)))
 
 ;; ## Helpers
 

@@ -1,7 +1,6 @@
 (ns alumbra.parser.schema
   (:require [alumbra.parser.antlr :as antlr]
-            [alumbra.parser.traverse :as t]
-            [alumbra.spec.schema :as schema]))
+            [alumbra.parser.traverse :as t]))
 
 ;; ## Parser
 
@@ -23,17 +22,17 @@
 
 (defn- parse-value
   [value-type f]
-  (let [value-key (keyword "alumbra.spec.schema" (name value-type))]
+  (let [value-key (keyword "alumbra" (name value-type))]
     (fn [traverse-fn state [_ v]]
       (assoc state
-             ::schema/value-type value-type
+             :alumbra/value-type value-type
              value-key (f v)))))
 
 (defn- parse-directive-location
   []
   (fn [traverse-fn state [_ [_ v]]]
     ;; TODO
-    (assoc state ::schema/directive-locations [])))
+    (assoc state :alumbra/directive-locations [])))
 
 (defn- read-nested-integer [[_ [_ v]]] (Long. v))
 
@@ -43,23 +42,23 @@
   []
   (fn [traverse-fn state [_ [_ [_ n]]]]
     (assoc state
-           ::schema/type-class   :named-type
-           ::schema/type-name    n
-           ::schema/non-null?    false)))
+           :alumbra/type-class   :named-type
+           :alumbra/type-name    n
+           :alumbra/non-null?    false)))
 
 (defn- traverse-list-type
   []
   (fn [traverse-fn state [_ _ element-type]]
     (assoc state
-           ::schema/type-class   :list-type
-           ::schema/non-null?    false
-           ::schema/element-type (traverse-fn {} element-type))))
+           :alumbra/type-class   :list-type
+           :alumbra/non-null?    false
+           :alumbra/element-type (traverse-fn {} element-type))))
 
 (defn- traverse-non-null-type
   []
   (fn [traverse-fn state [_ inner-type]]
     (-> (traverse-fn state inner-type)
-        (assoc ::schema/non-null? true))))
+        (assoc :alumbra/non-null? true))))
 
 ;; ### Schema Definition Traversal
 
@@ -67,8 +66,8 @@
   []
   (fn [traverse-fn state [_ operation-type _ schema-type]]
     (assoc state
-           ::schema/operation-type operation-type
-           ::schema/schema-type    (traverse-fn state schema-type))))
+           :alumbra/operation-type operation-type
+           :alumbra/schema-type    (traverse-fn state schema-type))))
 
 ;; ## Transformation
 
@@ -77,47 +76,47 @@
     {:schema                       (t/traverse-body)
      :definition                   (t/unwrap)
 
-     :typeDefinition               (t/collect-as ::schema/type-definitions)
+     :typeDefinition               (t/collect-as :alumbra/type-definitions)
      :typeImplements               (t/traverse-body)
-     :typeImplementsTypes          (t/body-as ::schema/interface-types)
-     :typeDefinitionFields         (t/block-as ::schema/type-fields)
+     :typeImplementsTypes          (t/body-as :alumbra/interface-types)
+     :typeDefinitionFields         (t/block-as :alumbra/type-fields)
      :typeDefinitionField          (t/traverse-body)
-     :typeDefinitionFieldType      (t/unwrap-as ::schema/type)
-     :fieldName                    (t/as ::schema/field-name read-nested-name)
+     :typeDefinitionFieldType      (t/unwrap-as :alumbra/type)
+     :fieldName                    (t/as :alumbra/field-name read-nested-name)
 
-     :typeExtensionDefinition      (t/collect-as ::schema/type-extensions)
-     :interfaceDefinition          (t/collect-as ::schema/interface-definitions)
-     :scalarDefinition             (t/collect-as ::schema/scalar-definitions)
+     :typeExtensionDefinition      (t/collect-as :alumbra/type-extensions)
+     :interfaceDefinition          (t/collect-as :alumbra/interface-definitions)
+     :scalarDefinition             (t/collect-as :alumbra/scalar-definitions)
 
-     :inputTypeDefinition          (t/collect-as ::schema/input-type-definitions)
-     :inputTypeDefinitionFields    (t/block-as ::schema/input-type-fields)
+     :inputTypeDefinition          (t/collect-as :alumbra/input-type-definitions)
+     :inputTypeDefinitionFields    (t/block-as :alumbra/input-type-fields)
      :inputTypeDefinitionField     (t/traverse-body)
-     :inputTypeDefinitionFieldType (t/unwrap-as ::schema/type)
+     :inputTypeDefinitionFieldType (t/unwrap-as :alumbra/type)
 
-     :arguments                    (t/block-as ::schema/type-field-arguments)
+     :arguments                    (t/block-as :alumbra/type-field-arguments)
      :argument                     (t/traverse-body)
-     :argumentName                 (t/as ::schema/argument-name read-nested-name)
-     :argumentType                 (t/unwrap-as ::schema/argument-type)
-     :defaultValue                 (t/unwrap-last-as ::schema/default-value)
+     :argumentName                 (t/as :alumbra/argument-name read-nested-name)
+     :argumentType                 (t/unwrap-as :alumbra/argument-type)
+     :defaultValue                 (t/unwrap-last-as :alumbra/default-value)
 
-     :schemaDefinition             (t/collect-as ::schema/schema-definitions)
-     :schemaTypes                  (t/body-as ::schema/schema-fields)
+     :schemaDefinition             (t/collect-as :alumbra/schema-definitions)
+     :schemaTypes                  (t/body-as :alumbra/schema-fields)
      :schemaType                   (traverse-schema-type)
 
-     :directiveDefinition          (t/collect-as ::schema/directive-definitions)
+     :directiveDefinition          (t/collect-as :alumbra/directive-definitions)
      :directiveLocations           (t/unwrap)
      :directiveLocation            (parse-directive-location)
-     :directiveName                (t/as ::schema/directive-name read-prefixed-name)
+     :directiveName                (t/as :alumbra/directive-name read-prefixed-name)
 
-     :unionDefinition              (t/collect-as ::schema/union-definitions)
-     :unionDefinitionTypes         (t/body-as ::schema/union-types)
+     :unionDefinition              (t/collect-as :alumbra/union-definitions)
+     :unionDefinitionTypes         (t/body-as :alumbra/union-types)
 
-     :enumDefinition               (t/collect-as ::schema/enum-definitions)
-     :enumDefinitionFields         (t/block-as ::schema/enum-fields)
+     :enumDefinition               (t/collect-as :alumbra/enum-definitions)
+     :enumDefinitionFields         (t/block-as :alumbra/enum-fields)
      :enumDefinitionField          (t/traverse-body)
-     :enumDefinitionFieldName      (t/as ::schema/enum read-nested-name)
+     :enumDefinitionFieldName      (t/as :alumbra/enum read-nested-name)
      :enumDefinitionType           (t/traverse-body)
-     :enumDefinitionIntValue       (t/as ::schema/integer read-nested-integer)
+     :enumDefinitionIntValue       (t/as :alumbra/integer read-nested-integer)
 
      :value                        (t/unwrap)
      :enumValue                    (parse-value :enum read-name)
@@ -130,11 +129,10 @@
      :namedType                    (traverse-named-type)
      :nonNullType                  (traverse-non-null-type)
      :listType                     (traverse-list-type)
-     :typeName                     (t/as ::schema/type-name read-nested-name)
-     :typeCondition                (t/unwrap-last-as ::schema/type-condition)}
-    ::schema/metadata))
+     :typeName                     (t/as :alumbra/type-name read-nested-name)
+     :typeCondition                (t/unwrap-last-as :alumbra/type-condition)}))
 
 (defn transform
-  "Transform the AST produced by [[parse]] to conform to `::schema/schema`."
+  "Transform the AST produced by [[parse]] to conform to `:alumbra/schema`."
   [ast]
   (traverse ast))

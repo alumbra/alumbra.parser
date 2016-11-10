@@ -8,7 +8,7 @@
             [alumbra.parser
              [antlr :as antlr]
              [document :refer [parse transform]]]
-            [alumbra.spec.document :as document]))
+            alumbra.spec))
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all
@@ -22,7 +22,7 @@
     (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (->> (transform ast)
-             (s/valid? ::document/document))))))
+             (s/valid? :alumbra/document))))))
 
 (defspec t-transform-produces-metadata-in-all-maps 500
   (prop/for-all
@@ -34,10 +34,10 @@
                coll?
                (fn [m]
                  (if (map? m)
-                   (seq (dissoc m ::document/metadata))
+                   (seq (dissoc m :alumbra/metadata))
                    m)))
              (filter map?)
-             (every? ::document/metadata))))))
+             (every? :alumbra/metadata))))))
 
 (defspec t-transform-collects-all-definitions 50
   (prop/for-all
@@ -46,8 +46,8 @@
       (when-not (antlr/error? ast)
         (let [result (transform ast)]
           (= (count (next ast))
-             (+ (count (::document/operations result))
-                (count (::document/fragments result)))))))))
+             (+ (count (:alumbra/operations result))
+                (count (:alumbra/fragments result)))))))))
 
 (defspec t-transform-collects-all-operation-variables 50
   (prop/for-all
@@ -65,6 +65,6 @@
                     0))
               variable-counts
               (->> (transform ast)
-                   (::document/operations)
-                   (map (comp count ::document/variables)))]
+                   (:alumbra/operations)
+                   (map (comp count :alumbra/variables)))]
           (= expected-variable-counts variable-counts))))))
