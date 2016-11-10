@@ -39,14 +39,14 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
        friends { name }
      }
    }")
-;; => #:graphql{:operations
-;;              [#:graphql{:operation-type "query",
+;; => #:alumbra{:operations
+;;              [#:alumbra{:operation-type "query",
 ;;                         :metadata {:row 0, :column 0, :index 0},
 ;;                         :operation-name "People",
 ;;                         ...}]}
 ```
 
-The resulting AST will conform to the spec `:graphql/document`.
+The resulting AST will conform to the spec `:alumbra/document`.
 
 ### Type System
 
@@ -61,14 +61,14 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
    type QueryRoot {
      people(limit: Int, offset: Int): [Person]
    }")
-;; => [#:graphql{:type-name "Person",
+;; => [#:alumbra{:type-name "Person",
 ;;               :metadata {:row 0, :column 5, :index 5},
-;;               :type-fields [#:graphql{:field-name "name",
+;;               :type-fields [#:alumbra{:field-name "name",
 ;;                                       :metadata {:row 1, :column 6, :index 20},
 ;;                                       ...}]}]
 ```
 
-The resulting AST will conform to the spec `:graphql/schema`.
+The resulting AST will conform to the spec `:alumbra/schema`.
 
 ### Tests
 

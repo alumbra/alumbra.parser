@@ -33,16 +33,16 @@
 
 (defn parse-document
   "Parse a GraphQL document and return its in-memory representation, conforming
-   to the `:graphql/document` spec.
+   to the `:alumbra/document` spec.
 
    ```clojure
    (parse-document \"{ id, name }\")
-   ;; => #:graphql{:operations
-   ;;              [#:graphql{:operation-type \"query\",
+   ;; => #:alumbra{:operations
+   ;;              [#:alumbra{:operation-type \"query\",
    ;;                         :selection-set
-   ;;                         [#:graphql{:field-name \"id\",
+   ;;                         [#:alumbra{:field-name \"id\",
    ;;                                    :metadata {:row 0, :column 2, :index 2}}
-   ;;                          #:graphql{:field-name \"name\",
+   ;;                          #:alumbra{:field-name \"name\",
    ;;                                    :metadata {:row 0, :column 6, :index 6}}],
    ;;                         :metadata {:row 0, :column 0, :index 0}}],
    ;;              :metadata {:row 0, :column 0, :index 0}}
@@ -58,22 +58,22 @@
 
 (defn parse-schema
   "Parse a GraphQL schema and return its in-memory representation, conforming
-   to the `:graphql/schema` spec.
+   to the `:alumbra/schema` spec.
 
    ```clojure
    (parse-schema \"type Person { id: Int!, name: String! }\")
-   ;; => [#:graphql{:type-name \"Person\",
+   ;; => [#:alumbra{:type-name \"Person\",
    ;;               :metadata {:row 0, :column 5, :index 5},
    ;;               :type-fields
-   ;;               [#:graphql{:field-name \"id\",
+   ;;               [#:alumbra{:field-name \"id\",
    ;;                          :metadata {:row 0, :column 14, :index 14},
-   ;;                          :type #:graphql{:type-class :named-type,
+   ;;                          :type #:alumbra{:type-class :named-type,
    ;;                                          :type-name \"Int\",
    ;;                                          :non-null? true,
    ;;                                           :metadata {:row 0, :column 18, :index 18}}}
-   ;;                #:graphql{:field-name \"name\",
+   ;;                #:alumbra{:field-name \"name\",
    ;;                          :metadata {:row 0, :column 24, :index 24},
-   ;;                          :type #:graphql{:type-class :named-type,
+   ;;                          :type #:alumbra{:type-class :named-type,
    ;;                                          :type-name \"String\",
    ;;                                          :non-null? true,
    ;;                                          :metadata {:row 0, :column 30, :index 30}}}],
