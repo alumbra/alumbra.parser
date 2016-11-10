@@ -7,8 +7,8 @@
             [alumbra.generators.schema :as g]
             [alumbra.parser
              [antlr :as antlr]
-             [schema :as schema]
-             spec]))
+             [schema :as schema]]
+            [alumbra.spec.schema :as sc]))
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all
@@ -22,4 +22,4 @@
     (let [ast (schema/parse schema)]
       (when-not (antlr/error? ast)
         (->> (schema/transform ast)
-             (s/valid? :graphql/schema))))))
+             (s/valid? ::sc/schema))))))

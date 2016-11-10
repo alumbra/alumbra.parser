@@ -7,52 +7,52 @@
             [alumbra.generators.document :as g]
             [alumbra.parser
              [antlr :as antlr]
-             [document :as document]
-             spec]))
+             [document :refer [parse transform]]]
+            [alumbra.spec.document :as document]))
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all
     [document g/-document]
-    (let [ast (document/parse document)]
+    (let [ast (parse document)]
       (not (antlr/error? ast)))))
 
 (defspec t-transform-conforms-to-spec 500
   (prop/for-all
     [document g/-document]
-    (let [ast (document/parse document)]
+    (let [ast (parse document)]
       (when-not (antlr/error? ast)
-        (->> (document/transform ast)
-             (s/valid? :graphql/document))))))
+        (->> (transform ast)
+             (s/valid? ::document/document))))))
 
 (defspec t-transform-produces-metadata-in-all-maps 500
   (prop/for-all
     [document g/-document]
-    (let [ast (document/parse document)]
+    (let [ast (parse document)]
       (when-not (antlr/error? ast)
-        (->> (document/transform ast)
+        (->> (transform ast)
              (tree-seq
                coll?
                (fn [m]
                  (if (map? m)
-                   (seq (dissoc m :graphql/metadata))
+                   (seq (dissoc m ::document/metadata))
                    m)))
              (filter map?)
-             (every? :graphql/metadata))))))
+             (every? ::document/metadata))))))
 
 (defspec t-transform-collects-all-definitions 50
   (prop/for-all
     [document g/-document]
-    (let [ast (document/parse document)]
+    (let [ast (parse document)]
       (when-not (antlr/error? ast)
-        (let [result (document/transform ast)]
+        (let [result (transform ast)]
           (= (count (next ast))
-             (+ (count (:graphql/operations result))
-                (count (:graphql/fragments result)))))))))
+             (+ (count (::document/operations result))
+                (count (::document/fragments result)))))))))
 
 (defspec t-transform-collects-all-operation-variables 50
   (prop/for-all
     [document g/-document]
-    (let [ast (document/parse document)]
+    (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (let [expected-variable-counts
               (for [[_ [k & rst]] (next ast)
@@ -64,7 +64,7 @@
                            (- (count body) 2)))))
                     0))
               variable-counts
-              (->> (document/transform ast)
-                   (:graphql/operations)
-                   (map (comp count :graphql/variables)))]
+              (->> (transform ast)
+                   (::document/operations)
+                   (map (comp count ::document/variables)))]
           (= expected-variable-counts variable-counts))))))

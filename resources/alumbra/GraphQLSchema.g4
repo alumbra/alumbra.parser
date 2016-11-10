@@ -175,11 +175,19 @@ inputTypeDefinitionFieldType
 // --------------- DIRECTIVES ---------------
 
 directiveDefinition
-    : K_DIRECTIVE directiveName typeCondition
+    : K_DIRECTIVE directiveName /* arguments? */ 'on' directiveLocations
     ;
 
 directiveName
     : '@' anyName
+    ;
+
+directiveLocations
+    : directiveLocation+
+    ;
+
+directiveLocation
+    : anyName
     ;
 
 // --------------- EXTEND TYPE ---------------

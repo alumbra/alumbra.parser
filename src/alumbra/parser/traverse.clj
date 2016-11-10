@@ -3,14 +3,14 @@
 ;; ## Metadata
 
 (defn- attach-position
-  [value form]
+  [value metadata-key form]
   {:pre [(map? value)]}
-  (if (contains? value :graphql/metadata)
+  (if (contains? value metadata-key)
     value
     (if-let [{:keys [antlr/row antlr/column antlr/index]}
              (some-> form meta :antlr/start)]
       (assoc value
-             :graphql/metadata
+             metadata-key
              {:row    row
               :column column
               :index  index})
@@ -19,13 +19,13 @@
 ;; ## Traversal
 
 (defn- traverse*
-  [visitors state form]
+  [visitors metadata-key state form]
   (if (string? form)
     state
     (let [k (first form)]
       (if-let [visitor (get visitors k)]
-        (-> (visitor #(traverse* visitors %1 %2) state form)
-            (attach-position form))
+        (-> (visitor #(traverse* visitors metadata-key %1 %2) state form)
+            (attach-position metadata-key form))
         (throw
           (IllegalStateException.
             (format "no visitor defined for node type '%s' in: %s"
@@ -38,12 +38,12 @@
    current form.
 
    The result of each visitor should be a map."
-  [visitors]
+  [visitors metadata-key]
   (let [visitors (->> (for [[ks visitor] visitors
                             k (if (sequential? ks) ks [ks])]
                         [k visitor])
                       (into {}))]
-    #(traverse* visitors {} %)))
+    #(traverse* visitors metadata-key {} %)))
 
 ;; ## Helpers
 
