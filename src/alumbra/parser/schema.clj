@@ -1,6 +1,7 @@
 (ns alumbra.parser.schema
   (:require [alumbra.parser.antlr :as antlr]
-            [alumbra.parser.traverse :as t]))
+            [alumbra.parser.traverse :as t]
+            [clojure.string :as string]))
 
 ;; ## Parser
 
@@ -30,9 +31,14 @@
 
 (defn- parse-directive-location
   []
-  (fn [traverse-fn state [_ [_ v]]]
-    ;; TODO
-    (assoc state :alumbra/directive-locations [])))
+  (fn [traverse-fn state [_ v]]
+    (update state
+            :alumbra/directive-locations
+            (fnil conj [])
+            (-> v
+                (string/replace "_" "-")
+                (string/lower-case)
+                (keyword)))))
 
 (defn- read-nested-integer [[_ [_ v]]] (Long. v))
 

@@ -10,7 +10,7 @@
                  [alumbra/spec "0.1.0-SNAPSHOT"]
                  [clj-antlr "0.2.3"]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]
-                                  [alumbra/generators "0.1.0"]]}
+                                  [alumbra/generators "0.1.1-SNAPSHOT"]]}
              :codox {:plugins [[lein-codox "0.10.0"]]
                      :dependencies [[codox-theme-rdash "0.1.1"]]
                      :codox {:project {:name "alumbra.parser"}
