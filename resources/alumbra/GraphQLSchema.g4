@@ -187,24 +187,7 @@ directiveLocations
     ;
 
 directiveLocation
-    : 'QUERY'
-    | 'MUTATION'
-    | 'SUBSCRIPTION'
-    | 'FIELD'
-    | 'FRAGMENT_DEFINITION'
-    | 'FRAGMENT_SPREAD'
-    | 'INLINE_FRAGMENT'
-    | 'SCHEMA'
-    | 'SCALAR'
-    | 'OBJECT'
-    | 'FIELD_DEFINITION'
-    | 'ARGUMENT_DEFINITION'
-    | 'INTERFACE'
-    | 'UNION'
-    | 'ENUM'
-    | 'ENUM_VALUE'
-    | 'INPUT_OBJECT'
-    | 'INPUT_FIELD_DEFINITION'
+    : DIRECTIVE_LOCATION
     ;
 
 // --------------- EXTEND TYPE ---------------
@@ -298,6 +281,7 @@ NullValue
 
 anyName
     : NAME
+    | DIRECTIVE_LOCATION
     | K_TYPE
     | K_IMPLEMENTS
     | K_INTERFACE
@@ -318,6 +302,7 @@ anyName
 
 fragmentName
     : NAME
+    | DIRECTIVE_LOCATION
     | K_TYPE
     | K_IMPLEMENTS
     | K_INTERFACE
@@ -333,6 +318,27 @@ fragmentName
     | K_QUERY
     | K_MUTATION
     | K_SUBSCRIPTION
+    ;
+
+DIRECTIVE_LOCATION
+    : 'QUERY'
+    | 'MUTATION'
+    | 'SUBSCRIPTION'
+    | 'FIELD'
+    | 'FRAGMENT_DEFINITION'
+    | 'FRAGMENT_SPREAD'
+    | 'INLINE_FRAGMENT'
+    | 'SCHEMA'
+    | 'SCALAR'
+    | 'OBJECT'
+    | 'FIELD_DEFINITION'
+    | 'ARGUMENT_DEFINITION'
+    | 'INTERFACE'
+    | 'UNION'
+    | 'ENUM'
+    | 'ENUM_VALUE'
+    | 'INPUT_OBJECT'
+    | 'INPUT_FIELD_DEFINITION'
     ;
 
 K_TYPE : 'type' ;
