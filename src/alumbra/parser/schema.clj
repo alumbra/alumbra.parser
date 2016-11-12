@@ -89,7 +89,7 @@
      :enumValue                    (parse-value :enum read-name)
      :intValue                     (parse-value :integer #(Long. %))
      :floatValue                   (parse-value :float #(Double. %))
-     :stringValue                  (parse-value :string str)
+     :stringValue                  (parse-value :string read-string-literal)
      :nullValue                    (parse-value :null (constantly nil))
      :booleanValue                 (parse-value :boolean #(= % "true"))
 
