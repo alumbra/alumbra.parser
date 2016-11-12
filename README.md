@@ -39,14 +39,10 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
        friends { name }
      }
    }")
-;; => #:alumbra{:operations
-;;              [#:alumbra{:operation-type "query",
-;;                         :metadata {:row 0, :column 0, :index 0},
-;;                         :operation-name "People",
-;;                         ...}]}
 ```
 
-The resulting AST will conform to the spec `:alumbra/document`.
+The resulting value will conform to the spec `:alumbra/document` or contain
+the key `:alumbra/parser-errors`.
 
 ### Type System
 
@@ -60,15 +56,13 @@ __[Documentation](https://alumbra.github.io/alumbra.parser/alumbra.parser.html#v
 
    type QueryRoot {
      people(limit: Int, offset: Int): [Person]
-   }")
-;; => [#:alumbra{:type-name "Person",
-;;               :metadata {:row 0, :column 5, :index 5},
-;;               :type-fields [#:alumbra{:field-name "name",
-;;                                       :metadata {:row 1, :column 6, :index 20},
-;;                                       ...}]}]
+   }
+
+   schema { query: QueryRoot }")
 ```
 
-The resulting AST will conform to the spec `:alumbra/schema`.
+The resulting value will conform to the spec `:alumbra/schema` or contain
+the key `:alumbra/parser-errors`.
 
 ### Tests
 
