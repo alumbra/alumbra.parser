@@ -175,7 +175,7 @@ inputTypeDefinitionFieldType
 // --------------- DIRECTIVES ---------------
 
 directiveDefinition
-    : K_DIRECTIVE directiveName /* arguments? */ 'on' directiveLocations
+    : K_DIRECTIVE directiveName arguments? 'on' directiveLocations
     ;
 
 directiveName
