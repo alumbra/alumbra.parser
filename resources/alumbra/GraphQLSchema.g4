@@ -255,6 +255,7 @@ value
     | booleanValue
     | stringValue
     | enumValue
+    | nullValue
     ;
 
 intValue
@@ -277,11 +278,21 @@ enumValue
     : anyName
     ;
 
+nullValue
+    : NullValue
+    ;
+
 // --------------- BOOLEAN---------------
 
 BooleanValue
     : 'true'
     | 'false';
+
+// --------------- NULL ---------------
+
+NullValue
+    : 'null'
+    ;
 
 // --------------- NAMES ---------------
 

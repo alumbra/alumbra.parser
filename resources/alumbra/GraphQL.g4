@@ -138,7 +138,9 @@ value
     | booleanValue
     | enumValue
     | arrayValue
-    | objectValue;
+    | objectValue
+    | nullValue
+    ;
 
 valueWithVariable
     : variableValue
@@ -148,7 +150,9 @@ valueWithVariable
     | booleanValue
     | enumValue
     | arrayValueWithVariable
-    | objectValueWithVariable;
+    | objectValueWithVariable
+    | nullValue
+    ;
 
 variableValue
     : variableName
@@ -206,6 +210,10 @@ objectFieldValueWithVariable
     : valueWithVariable
     ;
 
+nullValue
+    : NullValue
+    ;
+
 directives
     : directive+
     ;
@@ -245,6 +253,12 @@ nonNullType
 BooleanValue
     : 'true'
     | 'false';
+
+// --------------- NULL ---------------
+
+NullValue
+    : 'null'
+    ;
 
 // --------------- NAMES ---------------
 

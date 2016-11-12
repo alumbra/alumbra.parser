@@ -1,6 +1,7 @@
 (ns alumbra.parser.schema
   (:require [alumbra.parser.antlr :as antlr]
             [alumbra.parser.traverse :as t]
+            [alumbra.parser.utils :refer :all]
             [clojure.string :as string]))
 
 ;; ## Parser
@@ -13,21 +14,7 @@
 
 ;; ## Traversal
 
-;; ### Name Traversal
-
-(defn- read-name [[_ n]] n)
-(defn- read-nested-name [[_ [_ n]]] n)
-(defn- read-prefixed-name [[_ _ [_ n]]] n)
-
-;; ### Value Parsing
-
-(defn- parse-value
-  [value-type f]
-  (let [value-key (keyword "alumbra" (name value-type))]
-    (fn [traverse-fn state [_ v]]
-      (assoc state
-             :alumbra/value-type value-type
-             value-key (f v)))))
+;; ### Directives Parsing
 
 (defn- parse-directive-location
   []
@@ -39,32 +26,6 @@
                 (string/replace "_" "-")
                 (string/lower-case)
                 (keyword)))))
-
-(defn- read-nested-integer [[_ [_ v]]] (Long. v))
-
-;; ### Type Definition Traversal
-
-(defn- traverse-named-type
-  []
-  (fn [traverse-fn state [_ [_ [_ n]]]]
-    (assoc state
-           :alumbra/type-class   :named-type
-           :alumbra/type-name    n
-           :alumbra/non-null?    false)))
-
-(defn- traverse-list-type
-  []
-  (fn [traverse-fn state [_ _ element-type]]
-    (assoc state
-           :alumbra/type-class   :list-type
-           :alumbra/non-null?    false
-           :alumbra/element-type (traverse-fn {} element-type))))
-
-(defn- traverse-non-null-type
-  []
-  (fn [traverse-fn state [_ inner-type]]
-    (-> (traverse-fn state inner-type)
-        (assoc :alumbra/non-null? true))))
 
 ;; ### Schema Definition Traversal
 
@@ -129,6 +90,7 @@
      :intValue                     (parse-value :integer #(Long. %))
      :floatValue                   (parse-value :float #(Double. %))
      :stringValue                  (parse-value :string str)
+     :nullValue                    (parse-value :null (constantly nil))
      :booleanValue                 (parse-value :boolean #(= % "true"))
 
      :type                         (t/unwrap)
