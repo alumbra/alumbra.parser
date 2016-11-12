@@ -22,7 +22,7 @@
        (antlr-common/parser-rule-name p)
        (antlr-common/fast-keyword)))
 
-(defn- token->position
+(defn token->position
   [^Token t k]
   {:antlr/row    (dec (.getLine t))
    :antlr/column (.getCharPositionInLine t)

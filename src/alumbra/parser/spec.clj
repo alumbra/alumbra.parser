@@ -16,22 +16,25 @@
 
 (s/fdef document/transform
         :args (s/cat :ast sequential?)
-        :ret  :graphql/document)
+        :ret  :alumbra/document)
 
 (s/fdef schema/transform
         :args (s/cat :ast sequential?)
-        :ret  :graphql/schema)
+        :ret  :alumbra/schema)
 
 ;; ## Parsers
+
+(s/def ::parser-errors
+  (s/keys :req [:alumbra/parser-errors]))
 
 (s/fdef parser/parse-document
         :args (s/alt :string string?
                      :stream stream?)
-        :ret (s/alt :document :graphql/document
-                    :error     parser/error?))
+        :ret (s/alt :document :alumbra/document
+                    :error     ::parser-errors))
 
 (s/fdef parser/parse-schema
         :args (s/alt :string string?
                      :stream stream?)
-        :ret (s/alt :document :graphql/schema
-                    :error     parser/error?))
+        :ret (s/alt :document :alumbra/schema
+                    :error     ::parser-errors))
