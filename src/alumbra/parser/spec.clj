@@ -3,14 +3,8 @@
              [document :as document]
              [schema :as schema]]
             [alumbra.parser :as parser]
-            [alumbra.spec]
+            [alumbra.spec :as alumbra]
             [clojure.spec :as s]))
-
-;; ## Helper
-
-(defn- stream?
-  [value]
-  (instance? java.io.InputStream value))
 
 ;; ## Transformations
 
@@ -24,17 +18,8 @@
 
 ;; ## Parsers
 
-(s/def ::parser-errors
-  (s/keys :req [:alumbra/parser-errors]))
+(s/def parser/parse-document
+  ::alumbra/document-parser)
 
-(s/fdef parser/parse-document
-        :args (s/alt :string string?
-                     :stream stream?)
-        :ret (s/alt :document :alumbra/document
-                    :error     ::parser-errors))
-
-(s/fdef parser/parse-schema
-        :args (s/alt :string string?
-                     :stream stream?)
-        :ret (s/alt :document :alumbra/schema
-                    :error     ::parser-errors))
+(s/def parser/parse-document
+  ::alumbra/schema-parser)
