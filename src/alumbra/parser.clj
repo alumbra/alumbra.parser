@@ -19,8 +19,8 @@
   [result]
   {:alumbra/parser-errors
    (for [{:keys [message] :as error} @result]
-     {:alumbra/location             (error-location error)
-      :alumbra/parser-error-message message})})
+     {:alumbra/location      (error-location error)
+      :alumbra/error-message message})})
 
 (defn parse-document
   "Parse a GraphQL document and return its in-memory representation, conforming
