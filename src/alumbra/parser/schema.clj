@@ -46,7 +46,7 @@
      :typeDefinition               (t/collect-as :alumbra/type-definitions)
      :typeImplements               (t/traverse-body)
      :typeImplementsTypes          (t/body-as :alumbra/interface-types)
-     :typeDefinitionFields         (t/block-as :alumbra/type-fields)
+     :typeDefinitionFields         (t/block-as :alumbra/field-definitions)
      :typeDefinitionField          (t/traverse-body)
      :typeDefinitionFieldType      (t/unwrap-as :alumbra/type)
      :fieldName                    (t/as :alumbra/field-name read-nested-name)
@@ -56,11 +56,11 @@
      :scalarDefinition             (t/collect-as :alumbra/scalar-definitions)
 
      :inputTypeDefinition          (t/collect-as :alumbra/input-type-definitions)
-     :inputTypeDefinitionFields    (t/block-as :alumbra/input-type-fields)
+     :inputTypeDefinitionFields    (t/block-as :alumbra/input-field-definitions)
      :inputTypeDefinitionField     (t/traverse-body)
      :inputTypeDefinitionFieldType (t/unwrap-as :alumbra/type)
 
-     :arguments                    (t/block-as :alumbra/type-field-arguments)
+     :arguments                    (t/block-as :alumbra/argument-definitions)
      :argument                     (t/traverse-body)
      :argumentName                 (t/as :alumbra/argument-name read-nested-name)
      :argumentType                 (t/unwrap-as :alumbra/argument-type)
