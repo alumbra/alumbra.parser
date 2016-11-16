@@ -51,7 +51,7 @@ definition
 // --------------- OUTPUT TYPE ---------------
 
 typeDefinition
-    : K_TYPE typeName typeImplements? typeDefinitionFields
+    : K_TYPE typeName typeImplements? directives? typeDefinitionFields
     ;
 
 typeDefinitionFields
@@ -101,13 +101,13 @@ defaultValue
 // --------------- INTERFACE ---------------
 
 interfaceDefinition
-    : K_INTERFACE typeName typeDefinitionFields
+    : K_INTERFACE typeName directives? typeDefinitionFields
     ;
 
 // --------------- SCHEMA ---------------
 
 schemaDefinition
-    : K_SCHEMA '{' schemaTypes '}'
+    : K_SCHEMA directives? '{' schemaTypes '}'
     ;
 
 schemaTypes
@@ -121,7 +121,7 @@ schemaType
 // --------------- ENUM ---------------
 
 enumDefinition
-    : K_ENUM typeName enumDefinitionFields
+    : K_ENUM typeName directives? enumDefinitionFields
     ;
 
 enumDefinitionFields
@@ -147,7 +147,7 @@ enumDefinitionIntValue
 // --------------- UNION ---------------
 
 unionDefinition
-    : K_UNION typeName '=' unionDefinitionTypes
+    : K_UNION typeName '=' unionDefinitionTypes directives?
     ;
 
 unionDefinitionTypes
@@ -157,7 +157,7 @@ unionDefinitionTypes
 // --------------- INPUT TYPE ---------------
 
 inputTypeDefinition
-    : K_INPUT typeName inputTypeDefinitionFields
+    : K_INPUT typeName directives? inputTypeDefinitionFields
     ;
 
 inputTypeDefinitionFields
@@ -263,6 +263,28 @@ enumValue
 
 nullValue
     : NullValue
+    ;
+
+// ------------- DIRECTIVES ------------
+
+directives
+    : directive+
+    ;
+
+directive
+    : directiveName directiveArguments?
+    ;
+
+directiveArguments
+    : '(' directiveArgument+ ')'
+    ;
+
+directiveArgument
+    : argumentName ':' directiveArgumentValue
+    ;
+
+directiveArgumentValue
+    : value
     ;
 
 // --------------- BOOLEAN---------------

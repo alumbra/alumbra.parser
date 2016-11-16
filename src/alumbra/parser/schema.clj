@@ -74,6 +74,11 @@
      :directiveLocations           (t/unwrap)
      :directiveLocation            (parse-directive-location)
      :directiveName                (t/as :alumbra/directive-name read-prefixed-name)
+     :directives                   (t/body-as :alumbra/directives)
+     :directive                    (t/traverse-body)
+     :directiveArguments           (t/block-as :alumbra/arguments)
+     :directiveArgument            (t/traverse-body)
+     :directiveArgumentValue       (t/unwrap-as :alumbra/argument-value)
 
      :unionDefinition              (t/collect-as :alumbra/union-definitions)
      :unionDefinitionTypes         (t/body-as :alumbra/union-types)
