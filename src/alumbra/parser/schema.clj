@@ -92,8 +92,8 @@
 
      :value                        (t/unwrap)
      :enumValue                    (parse-value :enum read-name)
-     :intValue                     (parse-value :integer #(Long. %))
-     :floatValue                   (parse-value :float #(Double. %))
+     :intValue                     (parse-value :integer #(Long. ^String %))
+     :floatValue                   (parse-value :float #(Double. ^String %))
      :stringValue                  (parse-value :string read-string-literal)
      :nullValue                    (parse-value :null (constantly nil))
      :booleanValue                 (parse-value :boolean #(= % "true"))

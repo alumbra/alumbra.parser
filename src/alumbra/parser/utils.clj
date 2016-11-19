@@ -19,7 +19,7 @@
             (cond-> (some? v') (assoc value-key v')))))))
 
 (defn read-string-literal [s] (edn/read-string s))
-(defn read-nested-integer [[_ [_ v]]] (Long. v))
+(defn read-nested-integer [[_ [_ v]]] (Long. ^String v))
 
 ;; ## Types
 
