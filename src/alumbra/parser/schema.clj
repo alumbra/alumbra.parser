@@ -71,7 +71,7 @@
      :schemaType                   (traverse-schema-type)
 
      :directiveDefinition          (t/collect-as :alumbra/directive-definitions)
-     :directiveLocations           (t/unwrap)
+     :directiveLocations           (t/traverse-body)
      :directiveLocation            (parse-directive-location)
      :directiveName                (t/as :alumbra/directive-name read-prefixed-name)
      :directives                   (t/body-as :alumbra/directives)

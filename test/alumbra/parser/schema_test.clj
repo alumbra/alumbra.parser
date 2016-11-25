@@ -4,6 +4,7 @@
              [generators :as gen]
              [properties :as prop]]
             [clojure.spec :as s]
+            [clojure.test :refer :all]
             [alumbra.generators :as alumbra-gen]
             [alumbra.parser
              [antlr :as antlr]
@@ -23,3 +24,13 @@
       (when-not (antlr/error? ast)
         (->> (schema/transform ast)
              (s/valid? :alumbra/schema))))))
+
+(deftest t-transform-collects-all-directive-locations
+  (let [schema (schema/transform
+                 (schema/parse
+                   "directive @skip on FIELD, INLINE_FRAGMENT, FRAGMENT_SPREAD"))]
+    (is (= #{:field :inline-fragment :fragment-spread}
+           (set
+             (get-in schema [:alumbra/directive-definitions
+                             0
+                             :alumbra/directive-locations]))))))
