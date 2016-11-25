@@ -4,7 +4,7 @@
              [generators :as gen]
              [properties :as prop]]
             [clojure.spec :as s]
-            [alumbra.generators.document :as g]
+            [alumbra.generators :as alumbra-gen]
             [alumbra.parser
              [antlr :as antlr]
              [document :refer [parse transform]]]
@@ -12,13 +12,13 @@
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all
-    [document g/-document]
+    [document (alumbra-gen/raw-document)]
     (let [ast (parse document)]
       (not (antlr/error? ast)))))
 
 (defspec t-transform-conforms-to-spec 500
   (prop/for-all
-    [document g/-document]
+    [document (alumbra-gen/raw-document)]
     (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (->> (transform ast)
@@ -26,7 +26,7 @@
 
 (defspec t-transform-produces-metadata-in-all-maps 500
   (prop/for-all
-    [document g/-document]
+    [document (alumbra-gen/raw-document)]
     (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (->> (transform ast)
@@ -41,7 +41,7 @@
 
 (defspec t-transform-collects-all-definitions 50
   (prop/for-all
-    [document g/-document]
+    [document (alumbra-gen/raw-document)]
     (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (let [result (transform ast)]
@@ -51,7 +51,7 @@
 
 (defspec t-transform-collects-all-operation-variables 50
   (prop/for-all
-    [document g/-document]
+    [document (alumbra-gen/raw-document)]
     (let [ast (parse document)]
       (when-not (antlr/error? ast)
         (let [expected-variable-counts

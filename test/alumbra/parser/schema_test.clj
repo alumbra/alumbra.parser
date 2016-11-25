@@ -4,7 +4,7 @@
              [generators :as gen]
              [properties :as prop]]
             [clojure.spec :as s]
-            [alumbra.generators.schema :as g]
+            [alumbra.generators :as alumbra-gen]
             [alumbra.parser
              [antlr :as antlr]
              [schema :as schema]]
@@ -12,13 +12,13 @@
 
 (defspec t-parse-accepts-valid-queries 500
   (prop/for-all
-    [schema g/-schema]
+    [schema (alumbra-gen/raw-schema)]
     (let [ast (schema/parse schema)]
       (not (antlr/error? ast)))))
 
 (defspec t-transform-conforms-to-spec 500
   (prop/for-all
-    [schema g/-schema]
+    [schema (alumbra-gen/raw-schema)]
     (let [ast (schema/parse schema)]
       (when-not (antlr/error? ast)
         (->> (schema/transform ast)
