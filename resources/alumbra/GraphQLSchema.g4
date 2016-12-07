@@ -137,7 +137,7 @@ enumDefinitionFieldName
     ;
 
 enumDefinitionType
-    : '@' K_ENUM K_ENUM_INT  '(' 'value' ':' enumDefinitionIntValue ')'
+    : '@' K_ENUM K_ENUM_INT  '(' K_VALUE ':' enumDefinitionIntValue ')'
     ;
 
 enumDefinitionIntValue
@@ -320,6 +320,7 @@ anyName
     | K_QUERY
     | K_MUTATION
     | K_SUBSCRIPTION
+    | K_VALUE
     ;
 
 fragmentName
@@ -340,6 +341,7 @@ fragmentName
     | K_QUERY
     | K_MUTATION
     | K_SUBSCRIPTION
+    | K_VALUE
     ;
 
 DIRECTIVE_LOCATION
@@ -379,6 +381,7 @@ K_FRAGMENT : 'fragment' ;
 K_QUERY : 'query' ;
 K_MUTATION : 'mutation' ;
 K_SUBSCRIPTION : 'subscription' ;
+K_VALUE: 'value' ;
 
 NAME : [_A-Za-z][_0-9A-Za-z]* ;
 
