@@ -1,4 +1,4 @@
-(defproject alumbra/parser "0.1.3"
+(defproject alumbra/parser "0.1.4-SNAPSHOT"
   :description "A GraphQL parser for Clojure using ANTLR4."
   :url "https://github.com/alumbra/alumbra.parser"
   :license {:name "MIT License"
