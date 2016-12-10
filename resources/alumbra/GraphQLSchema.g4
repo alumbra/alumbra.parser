@@ -258,7 +258,7 @@ stringValue
     ;
 
 enumValue
-    : anyName
+    : enumValueName
     ;
 
 nullValue
@@ -290,18 +290,29 @@ directiveArgumentValue
 // --------------- BOOLEAN---------------
 
 BooleanValue
-    : 'true'
-    | 'false';
+    : K_TRUE
+    | K_FALSE;
 
 // --------------- NULL ---------------
 
 NullValue
-    : 'null'
+    : K_NULL
     ;
 
 // --------------- NAMES ---------------
 
 anyName
+    : nameTokens
+    | K_TRUE
+    | K_FALSE
+    | K_NULL
+    ;
+
+enumValueName
+    : nameTokens
+    ;
+
+nameTokens
     : NAME
     | DIRECTIVE_LOCATION
     | K_TYPE
@@ -316,27 +327,6 @@ anyName
     | K_EXTEND
     | K_SCALAR
     | K_ON
-    | K_FRAGMENT
-    | K_QUERY
-    | K_MUTATION
-    | K_SUBSCRIPTION
-    | K_VALUE
-    ;
-
-fragmentName
-    : NAME
-    | DIRECTIVE_LOCATION
-    | K_TYPE
-    | K_IMPLEMENTS
-    | K_INTERFACE
-    | K_SCHEMA
-    | K_ENUM
-    | K_ENUM_INT
-    | K_UNION
-    | K_INPUT
-    | K_DIRECTIVE
-    | K_EXTEND
-    | K_SCALAR
     | K_FRAGMENT
     | K_QUERY
     | K_MUTATION
@@ -365,23 +355,26 @@ DIRECTIVE_LOCATION
     | 'INPUT_FIELD_DEFINITION'
     ;
 
-K_TYPE : 'type' ;
-K_IMPLEMENTS : 'implements' ;
-K_INTERFACE : 'interface' ;
-K_SCHEMA : 'schema' ;
-K_ENUM : 'enum' ;
-K_ENUM_INT : 'Int' ;
-K_UNION : 'union' ;
-K_INPUT : 'input' ;
-K_DIRECTIVE : 'directive' ;
-K_EXTEND : 'extend' ;
-K_SCALAR : 'scalar' ;
-K_ON : 'on' ;
-K_FRAGMENT : 'fragment' ;
-K_QUERY : 'query' ;
-K_MUTATION : 'mutation' ;
+K_TYPE         : 'type'         ;
+K_IMPLEMENTS   : 'implements'   ;
+K_INTERFACE    : 'interface'    ;
+K_SCHEMA       : 'schema'       ;
+K_ENUM         : 'enum'         ;
+K_ENUM_INT     : 'Int'          ;
+K_UNION        : 'union'        ;
+K_INPUT        : 'input'        ;
+K_DIRECTIVE    : 'directive'    ;
+K_EXTEND       : 'extend'       ;
+K_SCALAR       : 'scalar'       ;
+K_ON           : 'on'           ;
+K_FRAGMENT     : 'fragment'     ;
+K_QUERY        : 'query'        ;
+K_MUTATION     : 'mutation'     ;
 K_SUBSCRIPTION : 'subscription' ;
-K_VALUE: 'value' ;
+K_VALUE        : 'value'        ;
+K_TRUE         : 'true'         ;
+K_FALSE        : 'false'        ;
+K_NULL         : 'null'         ;
 
 NAME : [_A-Za-z][_0-9A-Za-z]* ;
 

@@ -3,9 +3,15 @@
 
 ;; ## Names
 
-(defn read-name [[_ n]] n)
-(defn read-nested-name [[_ [_ n]]] n)
-(defn read-prefixed-name [[_ _ [_ n]]] n)
+(defn read-name
+  [[_ n]]
+  (if (string? n)
+    n
+    (recur n)))
+
+(defn read-prefixed-name
+  [[_ _ n]]
+  (read-name n))
 
 ;; ## Value Literals
 
@@ -25,10 +31,10 @@
 
 (defn traverse-named-type
   []
-  (fn [traverse-fn state [_ [_ [_ n]]]]
+  (fn [traverse-fn state [_ [_ n]]]
     (assoc state
            :alumbra/type-class   :named-type
-           :alumbra/type-name    n
+           :alumbra/type-name    (read-name n)
            :alumbra/non-null?    false)))
 
 (defn traverse-list-type

@@ -175,7 +175,7 @@ stringValue
     ;
 
 enumValue
-    : anyName
+    : enumValueName
     ;
 
 arrayValue
@@ -251,27 +251,35 @@ nonNullType
 // --------------- BOOLEAN---------------
 
 BooleanValue
-    : 'true'
-    | 'false';
+    : K_TRUE
+    | K_FALSE;
 
 // --------------- NULL ---------------
 
 NullValue
-    : 'null'
+    : K_NULL
     ;
 
 // --------------- NAMES ---------------
 
 anyName
-    : NAME
+    : fragmentName
     | K_ON
-    | K_FRAGMENT
-    | K_QUERY
-    | K_MUTATION
-    | K_SUBSCRIPTION
     ;
 
 fragmentName
+    : nameTokens
+    | K_TRUE
+    | K_FALSE
+    | K_NULL
+    ;
+
+enumValueName
+    : nameTokens
+    | K_ON
+    ;
+
+nameTokens
     : NAME
     | K_FRAGMENT
     | K_QUERY
@@ -279,11 +287,14 @@ fragmentName
     | K_SUBSCRIPTION
     ;
 
-K_ON : 'on' ;
-K_FRAGMENT : 'fragment' ;
-K_QUERY : 'query' ;
-K_MUTATION : 'mutation' ;
+K_ON           : 'on'           ;
+K_FRAGMENT     : 'fragment'     ;
+K_QUERY        : 'query'        ;
+K_MUTATION     : 'mutation'     ;
 K_SUBSCRIPTION : 'subscription' ;
+K_TRUE         : 'true'         ;
+K_FALSE        : 'false'        ;
+K_NULL         : 'null'         ;
 
 NAME : [_A-Za-z][_0-9A-Za-z]* ;
 

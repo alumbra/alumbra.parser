@@ -49,7 +49,7 @@
      :typeDefinitionFields         (t/block-as :alumbra/field-definitions)
      :typeDefinitionField          (t/traverse-body)
      :typeDefinitionFieldType      (t/unwrap-as :alumbra/type)
-     :fieldName                    (t/as :alumbra/field-name read-nested-name)
+     :fieldName                    (t/as :alumbra/field-name read-name)
 
      :typeExtensionDefinition      (t/collect-as :alumbra/type-extensions)
      :interfaceDefinition          (t/collect-as :alumbra/interface-definitions)
@@ -62,7 +62,7 @@
 
      :arguments                    (t/block-as :alumbra/argument-definitions)
      :argument                     (t/traverse-body)
-     :argumentName                 (t/as :alumbra/argument-name read-nested-name)
+     :argumentName                 (t/as :alumbra/argument-name read-name)
      :argumentType                 (t/unwrap-as :alumbra/argument-type)
      :defaultValue                 (t/unwrap-last-as :alumbra/default-value)
 
@@ -86,7 +86,7 @@
      :enumDefinition               (t/collect-as :alumbra/enum-definitions)
      :enumDefinitionFields         (t/block-as :alumbra/enum-fields)
      :enumDefinitionField          (t/traverse-body)
-     :enumDefinitionFieldName      (t/as :alumbra/enum read-nested-name)
+     :enumDefinitionFieldName      (t/as :alumbra/enum read-name)
      :enumDefinitionType           (t/traverse-body)
      :enumDefinitionIntValue       (t/as :alumbra/integer read-nested-integer)
 
@@ -102,7 +102,7 @@
      :namedType                    (traverse-named-type)
      :nonNullType                  (traverse-non-null-type)
      :listType                     (traverse-list-type)
-     :typeName                     (t/as :alumbra/type-name read-nested-name)
+     :typeName                     (t/as :alumbra/type-name read-name)
      :typeCondition                (t/unwrap-last-as :alumbra/type-condition)}))
 
 (defn transform

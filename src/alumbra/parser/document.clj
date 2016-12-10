@@ -65,8 +65,8 @@
      :selectionSet        (t/block-as :alumbra/selection-set)
      :selection           (t/unwrap)
      :field               (t/traverse-body)
-     :fieldName           (t/as :alumbra/field-name read-nested-name)
-     :fieldAlias          (t/as :alumbra/field-alias read-nested-name)
+     :fieldName           (t/as :alumbra/field-name read-name)
+     :fieldAlias          (t/as :alumbra/field-alias read-name)
      :fragmentSpread      (t/traverse-body)
      :inlineFragment      (t/traverse-body)
 
@@ -80,7 +80,7 @@
 
      :arguments           (t/block-as :alumbra/arguments)
      :argument            (t/traverse-body)
-     :argumentName        (t/as :alumbra/argument-name read-nested-name)
+     :argumentName        (t/as :alumbra/argument-name read-name)
      :argumentValue       (t/unwrap-as :alumbra/argument-value)
 
      :variableDefinitions (t/block-as :alumbra/variables)
@@ -106,7 +106,7 @@
      :namedType           (traverse-named-type)
      :nonNullType         (traverse-non-null-type)
      :listType            (traverse-list-type)
-     :typeName            (t/as :alumbra/type-name read-nested-name)}))
+     :typeName            (t/as :alumbra/type-name read-name)}))
 
 (defn transform
   "Transform the AST produced by [[parse]] to conform to
