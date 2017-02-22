@@ -83,7 +83,7 @@ arguments
     ;
 
 argument
-    : argumentName ':' argumentType defaultValue?
+    : argumentName directives? ':' argumentType defaultValue?
     ;
 
 argumentName
