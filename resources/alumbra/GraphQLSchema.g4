@@ -67,7 +67,7 @@ typeImplementsTypes
     ;
 
 typeDefinitionField
-    : fieldName arguments? ':' typeDefinitionFieldType
+    : fieldName arguments? directives? ':' typeDefinitionFieldType
     ;
 
 typeDefinitionFieldType
@@ -165,7 +165,7 @@ inputTypeDefinitionFields
     ;
 
 inputTypeDefinitionField
-    : fieldName ':' inputTypeDefinitionFieldType
+    : fieldName directives? ':' inputTypeDefinitionFieldType
     ;
 
 inputTypeDefinitionFieldType
