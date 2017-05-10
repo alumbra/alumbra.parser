@@ -238,6 +238,8 @@ value
     | booleanValue
     | stringValue
     | enumValue
+    | arrayValue
+    | objectValue
     | nullValue
     ;
 
@@ -259,6 +261,22 @@ stringValue
 
 enumValue
     : enumValueName
+    ;
+
+arrayValue
+    : '[' value* ']'
+    ;
+
+objectValue
+    : '{' objectField* '}'
+    ;
+
+objectField
+    : fieldName ':' objectFieldValue
+    ;
+
+objectFieldValue
+    : value
     ;
 
 nullValue

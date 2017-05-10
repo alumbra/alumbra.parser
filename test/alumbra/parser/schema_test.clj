@@ -25,6 +25,8 @@
         (->> (schema/transform ast)
              (s/valid? :alumbra/schema))))))
 
+;; ## Directive Locations
+
 (deftest t-transform-collects-all-directive-locations
   (let [schema (schema/transform
                  (schema/parse
@@ -34,3 +36,53 @@
              (get-in schema [:alumbra/directive-definitions
                              0
                              :alumbra/directive-locations]))))))
+
+;; ## Default Values
+
+(defn- collect-argument-default-values
+  [{:keys [alumbra/argument-definitions]}]
+  (->> (for [{:keys [alumbra/argument-name alumbra/default-value]}
+             argument-definitions]
+         [argument-name (:alumbra/value-type default-value)])
+       (into {})))
+
+(deftest t-transform-collects-argument-default-values
+  (let [schema (schema/transform
+                 (schema/parse
+                   "type X {
+                      field(
+                        simpleValue: S = 0,
+                        objectValue: O = {a: 0}
+                        listValue: L = [1 2 3]
+                        noValue: O
+                      ): Int
+                    }"))
+        argument->value-type
+        (collect-argument-default-values
+          (get-in schema [:alumbra/type-definitions  0
+                          :alumbra/field-definitions 0]))]
+    (are [argument-name expected-type]
+         (= expected-type (argument->value-type argument-name))
+         "simpleValue" :integer
+         "objectValue" :object
+         "listValue"   :list
+         "noValue"     nil)))
+
+(deftest t-transform-collects-directive-default-values
+  (let [schema (schema/transform
+                 (schema/parse
+                   "directive @some (
+                      simpleValue: S = 0,
+                      objectValue: O = {a: 0}
+                      listValue: L = [1 2 3]
+                      noValue: O
+                    ) on FIELD"))
+        argument->value-type
+        (collect-argument-default-values
+          (get-in schema [:alumbra/directive-definitions 0]))]
+    (are [argument-name expected-type]
+         (= expected-type (argument->value-type argument-name))
+         "simpleValue" :integer
+         "objectValue" :object
+         "listValue"   :list
+         "noValue"     nil)))

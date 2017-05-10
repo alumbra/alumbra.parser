@@ -36,6 +36,17 @@
            :alumbra/operation-type operation-type
            :alumbra/schema-type    (traverse-fn state schema-type))))
 
+;; ### Value Lists
+
+(defn traverse-value-list
+  [value-type]
+  (let [value-key (keyword "alumbra" (name value-type))]
+    (fn [traverse-fn state [_ _ & body-and-delimiter]]
+      (let [body (butlast body-and-delimiter)]
+        (assoc state
+               :alumbra/value-type value-type
+               value-key (mapv #(traverse-fn {} %) body))))))
+
 ;; ## Transformation
 
 (def ^:private traverse
@@ -97,6 +108,10 @@
      :stringValue                  (parse-value :string read-string-literal)
      :nullValue                    (parse-value :null (constantly nil))
      :booleanValue                 (parse-value :boolean #(= % "true"))
+     :arrayValue                   (traverse-value-list :list)
+     :objectValue                  (traverse-value-list :object)
+     :objectField                  (t/traverse-body)
+     :objectFieldValue             (t/unwrap-as :alumbra/value)
 
      :type                         (t/unwrap)
      :namedType                    (traverse-named-type)
