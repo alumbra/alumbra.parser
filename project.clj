@@ -7,12 +7,12 @@
             :year 2016
             :key "mit"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14" :scope "provided"]
-                 [alumbra/spec "0.1.6" :scope "provided"]
+                 [alumbra/spec "0.1.7" :scope "provided"]
                  [clj-antlr "0.2.4"]]
   :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]
                                   [alumbra/generators "0.2.2"]]}
              :codox {:plugins [[lein-codox "0.10.0"]]
-                     :dependencies [[codox-theme-rdash "0.1.1"]]
+                     :dependencies [[codox-theme-rdash "0.1.2"]]
                      :codox {:project {:name "alumbra.parser"}
                              :metadata {:doc/format :markdown}
                              :themes [:rdash]
