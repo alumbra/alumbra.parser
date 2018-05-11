@@ -67,7 +67,7 @@ typeImplementsTypes
     ;
 
 typeDefinitionField
-    : fieldName arguments? directives? ':' typeDefinitionFieldType
+    : fieldName arguments? ':' typeDefinitionFieldType directives?
     ;
 
 typeDefinitionFieldType
@@ -83,7 +83,7 @@ arguments
     ;
 
 argument
-    : argumentName directives? ':' argumentType defaultValue?
+    : argumentName ':' argumentType defaultValue? directives?
     ;
 
 argumentName
@@ -183,7 +183,7 @@ directiveName
     ;
 
 directiveLocations
-    : directiveLocation+
+    : '|'? directiveLocation ( '|' directiveLocation )*
     ;
 
 directiveLocation

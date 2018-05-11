@@ -30,7 +30,7 @@
 (deftest t-transform-collects-all-directive-locations
   (let [schema (schema/transform
                  (schema/parse
-                   "directive @skip on FIELD, INLINE_FRAGMENT, FRAGMENT_SPREAD"))]
+                   "directive @skip on FIELD | INLINE_FRAGMENT | FRAGMENT_SPREAD"))]
     (is (= #{:field :inline-fragment :fragment-spread}
            (set
              (get-in schema [:alumbra/directive-definitions
@@ -86,3 +86,20 @@
          "objectValue" :object
          "listValue"   :list
          "noValue"     nil)))
+
+; ## Directives on field definitions
+
+(deftest t-directives-allowed-on-field-definitions
+  (let [schema (schema/transform                            ;
+                 (schema/parse
+                    "type SomeType {
+                       field(arg: Int @example): String @example
+                     }"))]
+
+    (let [field-definition (-> schema :alumbra/type-definitions first :alumbra/field-definitions first)
+          directive-name #(-> % :alumbra/directives first :alumbra/directive-name)]
+      (is (= "example"
+             (directive-name field-definition)))
+
+      (is (= "example"
+             (-> field-definition :alumbra/argument-definitions first directive-name))))))
